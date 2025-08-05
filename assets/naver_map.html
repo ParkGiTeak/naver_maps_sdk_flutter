@@ -26,22 +26,30 @@
 
             let map;
 
-            function initMap(latitude = null, longitude = null, zoom = null) {
-                console.log("Naver Map Init Call", latitude, longitude, zoom);
+            function initMap(latlng = null, zoom = null) {
+                console.log("Naver Map Init Call", latlng, zoom);
 
                 window.navermap_authFailure = function () {
                     window.FlutterMethodChannel.postMessage(JSON.stringify({type: 'mapLoadFail'}));
                     console.log("Naver Map Init ERROR!");
                 }
 
-                const ititMapOptions = {
-                    center: new naver.maps.LatLng(latitude, longitude),
-                    zoom: zoom,
+                const baseOptions = {
                     mapTypeControl: false,
                     zoomControl: false,
                 }
 
-                map = new naver.maps.Map('map', ititMapOptions);
+                const mapOptions = { ...baseOptions };
+
+                if (latlng !== null) {
+                    mapOptions.center = new naver.maps.LatLng(latlng.latitude, latlng.longitude);
+                }
+
+                if (zoom !== null) {
+                    mapOptions.zoom = zoom;
+                }
+
+                map = new naver.maps.Map('map', mapOptions);
 
                 if (window.FlutterMethodChannel) {
                     window.FlutterMethodChannel.postMessage(JSON.stringify({type: 'mapLoaded'}));

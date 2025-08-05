@@ -101,12 +101,16 @@ class NaverMapWidget extends StatelessWidget {
     );
   }
 
-  Future<void> _initializeNaverMap(
-    LatLng? initialLatLng,
-    int? initialZoom,
-  ) async {
-    await controller.runJavaScript(
-      'initMap(${initialLatLng?.latitude}, ${initialLatLng?.longitude}, $initialZoom);',
-    );
+  Future<void> _initializeNaverMap(LatLng? location, int? zoom) async {
+    final String? latLng;
+    if (location != null) {
+      latLng = jsonEncode({
+        'latitude': location.latitude,
+        'longitude': location.longitude,
+      });
+    } else {
+      latLng = null;
+    }
+    await controller.runJavaScript('initMap($latLng, $zoom);');
   }
 }
