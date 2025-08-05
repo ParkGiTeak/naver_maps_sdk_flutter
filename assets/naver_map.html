@@ -26,6 +26,37 @@
 
             let map;
 
+            function getNaverPosition(positionValue) {
+                if (positionValue === null || positionValue === undefined) return undefined;
+                const positionMap = {
+                    0: naver.maps.Position.CENTER,
+                    1: naver.maps.Position.TOP_LEFT,
+                    2: naver.maps.Position.TOP_CENTER,
+                    3: naver.maps.Position.TOP_RIGHT,
+                    4: naver.maps.Position.LEFT_CENTER,
+                    5: naver.maps.Position.LEFT_TOP,
+                    6: naver.maps.Position.LEFT_BOTTOM,
+                    7: naver.maps.Position.RIGHT_TOP,
+                    8: naver.maps.Position.RIGHT_CENTER,
+                    9: naver.maps.Position.RIGHT_BOTTOM,
+                    10: naver.maps.Position.BOTTOM_LEFT,
+                    11: naver.maps.Position.BOTTOM_CENTER,
+                    12: naver.maps.Position.BOTTOM_RIGHT,
+                };
+                return positionMap[positionValue];
+            }
+
+            function getNaverMapTypeId(mapTypeId) {
+                if (mapTypeId === null || mapTypeId === undefined) return undefined;
+                const mapTypeIdMap = {
+                    'NORMAL': naver.maps.MapTypeId.NORMAL
+                    'TERRAIN': naver.maps.MapTypeId.TERRAIN
+                    'SATELLITE': naver.maps.MapTypeId.SATELLITE
+                    'HYBRID': naver.maps.MapTypeId.HYBRID
+                };
+                return mapTypeIdMap[mapTypeId];
+            }
+
             function initMap(mapOptions = null) {
                 console.log("Naver Map Init Call", mapOptions);
 
@@ -35,26 +66,6 @@
                 }
 
                 const initMapOptions = {};
-
-                function getNaverPosition(positionValue) {
-                    if (positionValue === null || positionValue === undefined) return undefined;
-                    const positionMap = {
-                        0: naver.maps.Position.CENTER,
-                        1: naver.maps.Position.TOP_LEFT,
-                        2: naver.maps.Position.TOP_CENTER,
-                        3: naver.maps.Position.TOP_RIGHT,
-                        4: naver.maps.Position.LEFT_CENTER,
-                        5: naver.maps.Position.LEFT_TOP,
-                        6: naver.maps.Position.LEFT_BOTTOM,
-                        7: naver.maps.Position.RIGHT_TOP,
-                        8: naver.maps.Position.RIGHT_CENTER,
-                        9: naver.maps.Position.RIGHT_BOTTOM,
-                        10: naver.maps.Position.BOTTOM_LEFT,
-                        11: naver.maps.Position.BOTTOM_CENTER,
-                        12: naver.maps.Position.BOTTOM_RIGHT,
-                    };
-                    return positionMap[positionValue];
-                }
 
                 if (mapOptions !== null) {
                     for (const key in mapOptions) {
@@ -136,6 +147,9 @@
                                         }
                                         initMapOptions.mapTypeControlOptions = newOpts;
                                     }
+                                    break;
+                                case 'mapTypeId':
+                                    initMapOptions.mapTypeId = getNaverMapTypeId(mapOptions.mapTypeId);
                                     break;
                                 case 'mapDataControlOptions':
                                 case 'logoControlOptions':
