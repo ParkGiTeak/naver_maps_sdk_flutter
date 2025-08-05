@@ -3,13 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:naver_maps_sdk_flutter/listener/map_load_status_listener.dart';
-import 'package:naver_maps_sdk_flutter/model/lat_lng.dart';
+import 'package:naver_maps_sdk_flutter/model/map_options.dart';
 import 'package:naver_maps_sdk_flutter/naver_maps_sdk_flutter.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class NaverMapWidget extends StatelessWidget {
-  final LatLng? _initialLatLng;
-  final int? _initialZoom;
+  final MapOptions? _mapOptions;
   final MapLoadStatusListener? _listener;
   late final String _applyScriptHtmlContent;
 
@@ -19,12 +18,10 @@ class NaverMapWidget extends StatelessWidget {
 
   NaverMapWidget({
     super.key,
-    LatLng? initialLatLng,
-    int? initialZoom,
+    MapOptions? mapOptions,
     MapLoadStatusListener? listener,
-  }) : _listener = listener,
-       _initialLatLng = initialLatLng,
-       _initialZoom = initialZoom;
+  }) : _mapOptions = mapOptions,
+       _listener = listener;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +52,7 @@ class NaverMapWidget extends StatelessWidget {
           },
           onPageFinished: (String url) {
             debugPrint('WebView Page Finished:: $url');
-            _initializeNaverMap(_initialLatLng, _initialZoom);
+            _initializeNaverMap(_mapOptions);
           },
           onWebResourceError: (WebResourceError error) {
             debugPrint('WebView Error:: $error');
@@ -101,16 +98,7 @@ class NaverMapWidget extends StatelessWidget {
     );
   }
 
-  Future<void> _initializeNaverMap(LatLng? location, int? zoom) async {
-    final String? latLng;
-    if (location != null) {
-      latLng = jsonEncode({
-        'latitude': location.latitude,
-        'longitude': location.longitude,
-      });
-    } else {
-      latLng = null;
-    }
-    await controller.runJavaScript('initMap($latLng, $zoom);');
+  Future<void> _initializeNaverMap(MapOptions? mapOptions) async {
+    await controller.runJavaScript('initMap(${mapOptions?.toJson() ?? '{}'})');
   }
 }

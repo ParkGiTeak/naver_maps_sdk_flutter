@@ -26,30 +26,25 @@
 
             let map;
 
-            function initMap(latlng = null, zoom = null) {
-                console.log("Naver Map Init Call", latlng, zoom);
+            function initMap(mapOptions = null) {
+                console.log("Naver Map Init Call", mapOptions);
 
                 window.navermap_authFailure = function () {
                     window.FlutterMethodChannel.postMessage(JSON.stringify({type: 'mapLoadFail'}));
                     console.log("Naver Map Init ERROR!");
                 }
 
-                const baseOptions = {
-                    mapTypeControl: false,
-                    zoomControl: false,
-                }
+                const initMapOptions = {};
 
-                const mapOptions = { ...baseOptions };
-
-                if (latlng !== null) {
-                    mapOptions.center = new naver.maps.LatLng(latlng.latitude, latlng.longitude);
+                if (mapOptions !== null) {
+                    mapOptions.center = new naver.maps.LatLng(mapOptions.center.lat, mapOptions.center.lng);
                 }
 
                 if (zoom !== null) {
-                    mapOptions.zoom = zoom;
+                    mapOptions.zoom = mapOptions.zoom;
                 }
 
-                map = new naver.maps.Map('map', mapOptions);
+                map = new naver.maps.Map('map', initMapOptions);
 
                 if (window.FlutterMethodChannel) {
                     window.FlutterMethodChannel.postMessage(JSON.stringify({type: 'mapLoaded'}));
