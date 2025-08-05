@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+        <script id="naverMapScript" type="text/javascript"></script>
+
+        <style>
+            html, body {
+                margin: 0;
+                padding: 0;
+                height: 100%;
+                overflow: hidden;
+            }
+            #map {
+                width: 100vw;
+                height: 100vh;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div>
+
+        <script type="text/javascript">
+
+            let map;
+
+                function initMap(latitude, longitude, zoom) {
+                console.log("Naver Map Init Call", latitude, longitude, zoom);
+
+                window.navermap_authFailure = function () {
+                    window.FlutterMethodChannel.postMessage(JSON.stringify({type: 'mapLoadFail'}));
+                    console.log("Naver Map Init ERROR!");
+                }
+
+                const ititMapOptions = {
+                    center: new naver.maps.LatLng(latitude, longitude),
+                    zoom: zoom,
+                    mapTypeControl: false,
+                    zoomControl: false,
+                }
+
+                map = new naver.maps.Map('map', ititMapOptions);
+
+                if (window.FlutterMethodChannel) {
+                    window.FlutterMethodChannel.postMessage(JSON.stringify({type: 'mapLoaded'}));
+                    console.log("MapLoaded Send Flutter");
+                }
+            }
+
+            window.setZoom = function(zoomLevel) {
+                if (map) {
+                    map.setZoom(zoomLevel);
+                    console.log(`setZoom Call zoomLevel: ${zoomLevel}`);
+                }
+            }
+        </script>
+    </body>
+</html>
