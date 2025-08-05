@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:naver_maps_sdk_flutter/listener/map_load_status_listener.dart';
 import 'package:naver_maps_sdk_flutter/model/lat_lng.dart';
 import 'package:naver_maps_sdk_flutter/naver_maps_sdk_flutter.dart';
@@ -9,9 +10,10 @@ import 'package:webview_flutter/webview_flutter.dart';
 class NaverMapWidget extends StatelessWidget {
   final LatLng? _initialLatLng;
   final int? _initialZoom;
+  final MapLoadStatusListener? _listener;
+  late final String _applyScriptHtmlContent;
 
   final WebViewController controller = WebViewController();
-  final MapLoadStatusListener? _listener;
 
   MapLoadStatusListener? get listener => _listener;
 
@@ -22,18 +24,21 @@ class NaverMapWidget extends StatelessWidget {
     MapLoadStatusListener? listener,
   }) : _listener = listener,
        _initialLatLng = initialLatLng,
-       _initialZoom = initialZoom {
-    if (!NaverMapSDK.instance.isInitialized) {
-      throw Exception(
-        'NaverMapSDK is not initialized. Call NaverMapSDK.initialize() first.',
-      );
-    }
-  }
+       _initialZoom = initialZoom;
 
   @override
   Widget build(BuildContext context) {
-    _initializeWebViewController();
-    return WebViewWidget(controller: controller);
+    return FutureBuilder<void>(
+      future: _initNaverScript(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else {
+          _initializeWebViewController();
+          return WebViewWidget(controller: controller);
+        }
+      },
+    );
   }
 
   void _initializeWebViewController() {
@@ -43,41 +48,57 @@ class NaverMapWidget extends StatelessWidget {
       ..setNavigationDelegate(
         NavigationDelegate(
           onProgress: (int progress) {
-            print('WebView is Loading Progress:: $progress');
+            debugPrint('WebView is Loading Progress:: $progress');
           },
           onPageStarted: (String url) {
-            print('WebView Page Started:: $url');
+            debugPrint('WebView Page Started:: $url');
           },
           onPageFinished: (String url) {
-            print('WebView Page Finished:: $url');
+            debugPrint('WebView Page Finished:: $url');
             _initializeNaverMap(_initialLatLng, _initialZoom);
           },
           onWebResourceError: (WebResourceError error) {
-            print('WebView Error:: $error');
+            debugPrint('WebView Error:: $error');
           },
         ),
       )
       ..addJavaScriptChannel(
         'FlutterMethodChannel',
         onMessageReceived: (JavaScriptMessage message) {
-          print('WebView Message:: ${message.message}');
+          debugPrint('WebView Message:: ${message.message}');
           try {
             final Map<String, dynamic> data = jsonDecode(message.message);
             final String type = data['type'];
 
             if (type == 'mapLoaded') {
-              print('Naver Map Api Loaded!!');
               _listener?.onMapLoadSuccess();
             } else if (type == 'mapLoadFail') {
-              print('Naver Map Api Load Fail!!');
               _listener?.onMapLoadFail();
             }
           } catch (e) {
-            print('Error WebView Parsing Message From JS:: $e');
+            _listener?.onMapLoadFail();
           }
         },
       )
-      ..loadHtmlString(NaverMapSDK.instance.htmlContent, baseUrl: NaverMapSDK.instance.webServiceUrl);
+      ..loadHtmlString(
+        _applyScriptHtmlContent,
+        baseUrl: NaverMapSDK.instance.webServiceUrl,
+      );
+  }
+
+  Future<void> _initNaverScript() async {
+    final String beforeHtmlContent = await rootBundle.loadString(
+      'packages/naver_maps_sdk_flutter/assets/naver_map.html',
+    );
+
+    final String scriptPlaceHolder =
+        '<script id="naverMapScript" type="text/javascript"></script>';
+    final String scriptNaverWithClientId =
+        '<script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${NaverMapSDK.instance.clientId}&language=${NaverMapSDK.instance.language.value}"></script>';
+    _applyScriptHtmlContent = beforeHtmlContent.replaceFirst(
+      scriptPlaceHolder,
+      scriptNaverWithClientId,
+    );
   }
 
   Future<void> _initializeNaverMap(
