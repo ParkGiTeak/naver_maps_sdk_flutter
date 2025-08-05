@@ -40,7 +40,7 @@ class NaverMapSDK {
     instance._language = language;
 
     final String beforeHtmlContent = await rootBundle.loadString(
-      'assets/naver_map.html',
+      'packages/naver_maps_sdk_flutter/assets/naver_map.html',
     );
 
     final String scriptPlaceHolder =
