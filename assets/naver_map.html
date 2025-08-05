@@ -37,11 +37,11 @@
                 const initMapOptions = {};
 
                 if (mapOptions !== null) {
-                    mapOptions.center = new naver.maps.LatLng(mapOptions.center.lat, mapOptions.center.lng);
+                    initMapOptions.center = new naver.maps.LatLng(mapOptions.center.lat, mapOptions.center.lng);
                 }
 
                 if (zoom !== null) {
-                    mapOptions.zoom = mapOptions.zoom;
+                    initMapOptions.zoom = mapOptions.zoom;
                 }
 
                 map = new naver.maps.Map('map', initMapOptions);
