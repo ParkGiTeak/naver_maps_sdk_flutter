@@ -123,9 +123,22 @@
                                         style: mapOptions.zoomControlOptions.style === 'LARGE' ? naver.maps.ZoomControlStyle.LARGE : naver.maps.ZoomControlStyle.SMALL
                                     };
                                     break;
+                                case 'mapTypeControlOptions':
+                                    {
+                                        const opts = mapOptions.mapTypeControlOptions;
+                                        const newOpts = {};
+                                        if (opts.position) newOpts.position = getNaverPosition(opts.position);
+                                        if (opts.style) newOpts.style = opts.style === 'DROPDOWN' ? naver.maps.MapTypeControlStyle.DROPDOWN : naver.maps.MapTypeControlStyle.BUTTONS;
+                                        if (opts.mapTypeIds) {
+                                            newOpts.mapTypeIds = opts.mapTypeIds
+                                                .map(idStr => naver.maps.MapTypeId[idStr])
+                                                .filter(Boolean);
+                                        }
+                                        initMapOptions.mapTypeControlOptions = newOpts;
+                                    }
+                                    break;
                                 case 'mapDataControlOptions':
                                 case 'logoControlOptions':
-                                case 'mapTypeControlOptions':
                                 case 'scaleControlOptions':
                                     initMapOptions[key] = {
                                         ...mapOptions[key],
