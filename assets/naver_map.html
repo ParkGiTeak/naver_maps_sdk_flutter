@@ -41,7 +41,7 @@
                     9: naver.maps.Position.RIGHT_BOTTOM,
                     10: naver.maps.Position.BOTTOM_LEFT,
                     11: naver.maps.Position.BOTTOM_CENTER,
-                    12: naver.maps.Position.BOTTOM_RIGHT,
+                    12: naver.maps.Position.BOTTOM_RIGHT
                 };
                 return positionMap[positionValue];
             }
@@ -49,9 +49,9 @@
             function getNaverMapTypeId(mapTypeId) {
                 if (mapTypeId === null || mapTypeId === undefined) return undefined;
                 const mapTypeIdMap = {
-                    'NORMAL': naver.maps.MapTypeId.NORMAL
-                    'TERRAIN': naver.maps.MapTypeId.TERRAIN
-                    'SATELLITE': naver.maps.MapTypeId.SATELLITE
+                    'NORMAL': naver.maps.MapTypeId.NORMAL,
+                    'TERRAIN': naver.maps.MapTypeId.TERRAIN,
+                    'SATELLITE': naver.maps.MapTypeId.SATELLITE,
                     'HYBRID': naver.maps.MapTypeId.HYBRID
                 };
                 return mapTypeIdMap[mapTypeId];
