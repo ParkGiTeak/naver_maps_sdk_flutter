@@ -11,6 +11,7 @@ class NaverMapSDK {
   bool _isInitialized = false;
   late final String _clientId;
   late final NaverMapLanguageType _language;
+  late final String _webServiceUrl;
   late final String _htmlContent;
 
   bool get isInitialized => _isInitialized;
@@ -18,6 +19,7 @@ class NaverMapSDK {
   String get clientId => _clientId;
 
   NaverMapLanguageType get language => _language;
+  String get webServiceUrl => _webServiceUrl;
 
   String get htmlContent {
     if (!_isInitialized) {
@@ -30,6 +32,7 @@ class NaverMapSDK {
 
   static Future<void> initialize({
     required String clientId,
+    required String webServiceUrl,
     NaverMapLanguageType language = NaverMapLanguageType.korean,
   }) async {
     if (instance.isInitialized) {
@@ -37,6 +40,7 @@ class NaverMapSDK {
       return;
     }
     instance._clientId = clientId;
+    instance._webServiceUrl = webServiceUrl;
     instance._language = language;
 
     final String beforeHtmlContent = await rootBundle.loadString(

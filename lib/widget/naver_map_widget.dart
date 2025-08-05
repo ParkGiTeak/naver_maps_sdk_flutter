@@ -77,7 +77,7 @@ class NaverMapWidget extends StatelessWidget {
           }
         },
       )
-      ..loadHtmlString(NaverMapSDK.instance.htmlContent);
+      ..loadHtmlString(NaverMapSDK.instance.htmlContent, baseUrl: NaverMapSDK.instance.webServiceUrl);
   }
 
   Future<void> _initializeNaverMap(
