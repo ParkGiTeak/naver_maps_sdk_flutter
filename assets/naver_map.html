@@ -26,7 +26,7 @@
 
             let map;
 
-                function initMap(latitude, longitude, zoom) {
+            function initMap(latitude = null, longitude = null, zoom = null) {
                 console.log("Naver Map Init Call", latitude, longitude, zoom);
 
                 window.navermap_authFailure = function () {
