@@ -1,10 +1,17 @@
+import 'dart:convert';
+
 class NPadding {
   final double top;
   final double right;
   final double bottom;
   final double left;
 
-  const NPadding({this.top = 0, this.right = 0, this.bottom = 0, this.left = 0});
+  const NPadding({
+    this.top = 0,
+    this.right = 0,
+    this.bottom = 0,
+    this.left = 0,
+  });
 
   const NPadding.all(double value)
     : top = value,
@@ -22,7 +29,12 @@ class NPadding {
   }
 
   Map<String, dynamic> toJson() {
-    return {'top': top, 'right': right, 'bottom': bottom, 'left': left};
+    return {
+      'top': jsonEncode(top),
+      'right': jsonEncode(right),
+      'bottom': jsonEncode(bottom),
+      'left': jsonEncode(left),
+    };
   }
 
   @override

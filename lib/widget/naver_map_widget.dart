@@ -99,6 +99,7 @@ class NaverMapWidget extends StatelessWidget {
   }
 
   Future<void> _initializeNaverMap(MapOptions? mapOptions) async {
+    debugPrint('mapOptions:: ${mapOptions?.toJson() ?? '{}'}');
     await controller.runJavaScript('initMap(${mapOptions?.toJson() ?? '{}'})');
   }
 }

@@ -142,7 +142,7 @@
                                         if (opts.style) newOpts.style = opts.style === 'DROPDOWN' ? naver.maps.MapTypeControlStyle.DROPDOWN : naver.maps.MapTypeControlStyle.BUTTONS;
                                         if (opts.mapTypeIds) {
                                             newOpts.mapTypeIds = opts.mapTypeIds
-                                                .map(idStr => naver.maps.MapTypeId[idStr])
+                                                .map(idStr => getNaverMapTypeId(idStr))
                                                 .filter(Boolean);
                                         }
                                         initMapOptions.mapTypeControlOptions = newOpts;

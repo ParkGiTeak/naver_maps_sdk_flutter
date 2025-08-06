@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:naver_maps_sdk_flutter/model/bounds.dart';
 import 'package:naver_maps_sdk_flutter/model/n_lat_lng.dart';
 
@@ -16,7 +18,10 @@ class NLatLngBounds implements Bounds {
 
   @override
   Map<String, dynamic> toJson() {
-    return {'southWest': southWest.toJson(), 'northEast': northEast.toJson()};
+    return {
+      'southWest': jsonEncode(southWest.toJson()),
+      'northEast': jsonEncode(northEast.toJson()),
+    };
   }
 
   bool contains(NLatLng coord) {

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:naver_maps_sdk_flutter/enum/naver_map_map_type_id.dart';
 import 'package:naver_maps_sdk_flutter/enum/naver_map_position_type.dart';
 import 'package:naver_maps_sdk_flutter/model/bounds.dart';
@@ -230,52 +232,52 @@ class MapOptions {
 
   Map<String, dynamic> toJson() {
     return {
-      if (background != null) 'background': background,
-      if (baseTileOpacity != null) 'baseTileOpacity': baseTileOpacity,
+      if (background != null) 'background': jsonEncode(background),
+      if (baseTileOpacity != null) 'baseTileOpacity': jsonEncode(baseTileOpacity),
       if (bounds != null) 'bounds': bounds!.toJson(),
       if (center != null) 'center': center!.toJson(),
       if (disableDoubleClickZoom != null)
-        'disableDoubleClickZoom': disableDoubleClickZoom,
+        'disableDoubleClickZoom': jsonEncode(disableDoubleClickZoom),
       if (disableDoubleTapZoom != null)
-        'disableDoubleTapZoom': disableDoubleTapZoom,
-      if (disableKineticPan != null) 'disableKineticPan': disableKineticPan,
+        'disableDoubleTapZoom': jsonEncode(disableDoubleTapZoom),
+      if (disableKineticPan != null) 'disableKineticPan': jsonEncode(disableKineticPan),
       if (disableTwoFingerTapZoom != null)
-        'disableTwoFingerTapZoom': disableTwoFingerTapZoom,
-      if (draggable != null) 'draggable': draggable,
-      if (keyboardShortcuts != null) 'keyboardShortcuts': keyboardShortcuts,
-      if (logoControl != null) 'logoControl': logoControl,
+        'disableTwoFingerTapZoom': jsonEncode(disableTwoFingerTapZoom),
+      if (draggable != null) 'draggable': jsonEncode(draggable),
+      if (keyboardShortcuts != null) 'keyboardShortcuts': jsonEncode(keyboardShortcuts),
+      if (logoControl != null) 'logoControl': jsonEncode(logoControl),
       if (logoControlOptions != null)
         'logoControlOptions': logoControlOptions!.toJson(),
-      if (mapDataControl != null) 'mapDataControl': mapDataControl,
+      if (mapDataControl != null) 'mapDataControl': jsonEncode(mapDataControl),
       if (mapDataControlOptions != null)
         'mapDataControlOptions': mapDataControlOptions!.toJson(),
-      if (mapTypeControl != null) 'mapTypeControl': mapTypeControl,
+      if (mapTypeControl != null) 'mapTypeControl': jsonEncode(mapTypeControl),
       if (mapTypeControlOptions != null)
         'mapTypeControlOptions': mapTypeControlOptions!.toJson(),
-      if (mapTypeId != null) 'mapTypeId': mapTypeId!.value,
+      if (mapTypeId != null) 'mapTypeId': jsonEncode(mapTypeId!.value),
       if (maxBounds != null) 'maxBounds': maxBounds!.toJson(),
-      if (maxZoom != null) 'maxZoom': maxZoom,
-      if (minZoom != null) 'minZoom': minZoom,
+      if (maxZoom != null) 'maxZoom': jsonEncode(maxZoom),
+      if (minZoom != null) 'minZoom': jsonEncode(minZoom),
       if (padding != null) 'padding': padding!.toJson(),
-      if (pinchZoom != null) 'pinchZoom': pinchZoom,
-      if (resizeOrigin != null) 'resizeOrigin': resizeOrigin!.value,
-      if (scaleControl != null) 'scaleControl': scaleControl,
+      if (pinchZoom != null) 'pinchZoom': jsonEncode(pinchZoom),
+      if (resizeOrigin != null) 'resizeOrigin': jsonEncode(resizeOrigin!.value),
+      if (scaleControl != null) 'scaleControl': jsonEncode(scaleControl),
       if (scaleControlOptions != null)
         'scaleControlOptions': scaleControlOptions!.toJson(),
-      if (scrollWheel != null) 'scrollWheel': scrollWheel,
+      if (scrollWheel != null) 'scrollWheel': jsonEncode(scrollWheel),
       if (size != null) 'size': size!.toJson(),
-      if (overlayZoomEffect != null) 'overlayZoomEffect': overlayZoomEffect,
-      if (tileSpare != null) 'tileSpare': tileSpare,
-      if (tileTransition != null) 'tileTransition': tileTransition,
-      if (tileDuration != null) 'tileDuration': tileDuration,
-      if (zoom != null) 'zoom': zoom,
-      if (zoomControl != null) 'zoomControl': zoomControl,
+      if (overlayZoomEffect != null) 'overlayZoomEffect': jsonEncode(overlayZoomEffect),
+      if (tileSpare != null) 'tileSpare': jsonEncode(tileSpare),
+      if (tileTransition != null) 'tileTransition': jsonEncode(tileTransition),
+      if (tileDuration != null) 'tileDuration': jsonEncode(tileDuration),
+      if (zoom != null) 'zoom': jsonEncode(zoom),
+      if (zoomControl != null) 'zoomControl': jsonEncode(zoomControl),
       if (zoomControlOptions != null)
         'zoomControlOptions': zoomControlOptions!.toJson(),
       if (zoomOrigin != null) 'zoomOrigin': zoomOrigin!.toJson(),
-      if (blankTileImage != null) 'blankTileImage': blankTileImage,
-      if (gl != null) 'gl': gl,
-      if (customStyleId != null) 'customStyleId': customStyleId,
+      if (blankTileImage != null) 'blankTileImage': jsonEncode(blankTileImage),
+      if (gl != null) 'gl': jsonEncode(gl),
+      if (customStyleId != null) 'customStyleId': jsonEncode(customStyleId),
     };
   }
 }

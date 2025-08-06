@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class NSize {
   final double width;
   final double height;
@@ -12,7 +14,7 @@ class NSize {
   }
 
   Map<String, dynamic> toJson() {
-    return {'width': width, 'height': height};
+    return {'width': jsonEncode(width), 'height': jsonEncode(height)};
   }
 
   @override
