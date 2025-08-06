@@ -3,23 +3,24 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:naver_maps_sdk_flutter/listener/map_load_status_listener.dart';
+import 'package:naver_maps_sdk_flutter/manager/naver_map_manager.dart';
 import 'package:naver_maps_sdk_flutter/model/map_options.dart';
 import 'package:naver_maps_sdk_flutter/naver_maps_sdk_flutter.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class NaverMapWidget extends StatelessWidget {
   final MapOptions? _mapOptions;
-  final MapLoadStatusListener? _listener;
+  final MapLoadStatusListener _listener;
   late final String _applyScriptHtmlContent;
 
-  final WebViewController controller = WebViewController();
+  final WebViewController _controller = WebViewController();
 
   MapLoadStatusListener? get listener => _listener;
 
   NaverMapWidget({
     super.key,
     MapOptions? mapOptions,
-    MapLoadStatusListener? listener,
+    required MapLoadStatusListener listener,
   }) : _mapOptions = mapOptions,
        _listener = listener;
 
@@ -32,14 +33,14 @@ class NaverMapWidget extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         } else {
           _initializeWebViewController();
-          return WebViewWidget(controller: controller);
+          return WebViewWidget(controller: _controller);
         }
       },
     );
   }
 
   void _initializeWebViewController() {
-    controller
+    _controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(
@@ -68,12 +69,12 @@ class NaverMapWidget extends StatelessWidget {
             final String type = data['type'];
 
             if (type == 'mapLoaded') {
-              _listener?.onMapLoadSuccess();
+              _listener.onMapLoadSuccess(NaverMapManager(_controller));
             } else if (type == 'mapLoadFail') {
-              _listener?.onMapLoadFail();
+              _listener.onMapLoadFail();
             }
           } catch (e) {
-            _listener?.onMapLoadFail();
+            _listener.onMapLoadFail();
           }
         },
       )
@@ -100,6 +101,6 @@ class NaverMapWidget extends StatelessWidget {
 
   Future<void> _initializeNaverMap(MapOptions? mapOptions) async {
     debugPrint('mapOptions:: ${mapOptions?.toJson() ?? '{}'}');
-    await controller.runJavaScript('initMap(${mapOptions?.toJson() ?? '{}'})');
+    await _controller.runJavaScript('initMap(${mapOptions?.toJson() ?? '{}'})');
   }
 }
