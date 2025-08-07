@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:naver_maps_sdk_flutter/model/coord.dart';
 import 'package:naver_maps_sdk_flutter/model/n_lat_lng.dart';
 import 'package:naver_maps_sdk_flutter/model/n_point.dart';
+import 'package:naver_maps_sdk_flutter/util/ns_dictionary_util.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class NaverMapManager {
@@ -11,38 +13,33 @@ class NaverMapManager {
   NaverMapManager(WebViewController controller) : _controller = controller;
 
   Future<Coord> getCenter({required bool resultTypeLatLng}) async {
-    final String jsonStringResult =
+    String jsonStringResult =
         await _controller.runJavaScriptReturningResult('map.getCenter()')
             as String;
+    if (Platform.isIOS) {
+      jsonStringResult = NSDictionaryUtil.convert(jsonStringResult);
+    }
     final Map<String, dynamic> json = jsonDecode(jsonStringResult);
     if (resultTypeLatLng) {
-      final Coord coord = NLatLng(
-        json['_lat']?.toDouble() ?? 0.0,
-        json['_lng']?.toDouble() ?? 0.0,
-      );
+      final Coord coord = NLatLng(json['_lat'], json['_lng']);
       return coord;
     } else {
-      final Coord coord = NPoint(
-        json['x']?.toDouble() ?? 0.0,
-        json['y']?.toDouble() ?? 0.0,
-      );
+      final Coord coord = NPoint(json['x'], json['y']);
       return coord;
     }
   }
 
   Future<int> getZoom() async {
-    final int jsonStringResult =
-        await _controller.runJavaScriptReturningResult('map.getZoom()') as int;
-    return jsonStringResult;
+    final num jsonStringResult =
+        await _controller.runJavaScriptReturningResult('map.getZoom()') as num;
+    return jsonStringResult.toInt();
   }
 
   Future<void> setCenter({required Coord center}) async {
-    await _controller.runJavaScriptReturningResult(
-      'map.setCenter(${center.toJson()})',
-    );
+    await _controller.runJavaScript('map.setCenter(${center.toJson()})');
   }
 
   Future<void> setZoom({required int zoom}) async {
-    await _controller.runJavaScriptReturningResult('map.setZoom($zoom)');
+    await _controller.runJavaScript('map.setZoom($zoom)');
   }
 }
