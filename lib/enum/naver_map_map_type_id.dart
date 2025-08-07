@@ -1,8 +1,8 @@
 enum NaverMapMapTypeId {
-  normal('NORMAL'),
-  terrain('TERRAIN'),
-  satellite('SATELLITE'),
-  hybrid('HYBRID');
+  normal('normal'),
+  terrain('terrain'),
+  satellite('satellite'),
+  hybrid('hybrid');
 
   const NaverMapMapTypeId(this.value);
   final String value;

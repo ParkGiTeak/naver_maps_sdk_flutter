@@ -23,39 +23,7 @@
         <div id="map"></div>
 
         <script type="text/javascript">
-
             let map;
-
-            function getNaverPosition(positionValue) {
-                if (positionValue === null || positionValue === undefined) return undefined;
-                const positionMap = {
-                    0: naver.maps.Position.CENTER,
-                    1: naver.maps.Position.TOP_LEFT,
-                    2: naver.maps.Position.TOP_CENTER,
-                    3: naver.maps.Position.TOP_RIGHT,
-                    4: naver.maps.Position.LEFT_CENTER,
-                    5: naver.maps.Position.LEFT_TOP,
-                    6: naver.maps.Position.LEFT_BOTTOM,
-                    7: naver.maps.Position.RIGHT_TOP,
-                    8: naver.maps.Position.RIGHT_CENTER,
-                    9: naver.maps.Position.RIGHT_BOTTOM,
-                    10: naver.maps.Position.BOTTOM_LEFT,
-                    11: naver.maps.Position.BOTTOM_CENTER,
-                    12: naver.maps.Position.BOTTOM_RIGHT
-                };
-                return positionMap[positionValue];
-            }
-
-            function getNaverMapTypeId(mapTypeId) {
-                if (mapTypeId === null || mapTypeId === undefined) return undefined;
-                const mapTypeIdMap = {
-                    'NORMAL': naver.maps.MapTypeId.NORMAL,
-                    'TERRAIN': naver.maps.MapTypeId.TERRAIN,
-                    'SATELLITE': naver.maps.MapTypeId.SATELLITE,
-                    'HYBRID': naver.maps.MapTypeId.HYBRID
-                };
-                return mapTypeIdMap[mapTypeId];
-            }
 
             function initMap(mapOptions = null) {
                 console.log("Naver Map Init Call", mapOptions);
@@ -65,109 +33,7 @@
                     console.log("Naver Map Init ERROR!");
                 }
 
-                const initMapOptions = {};
-
-                if (mapOptions !== null) {
-                    for (const key in mapOptions) {
-                        if (mapOptions.hasOwnProperty(key) && mapOptions[key] !== null) {
-                            switch (key) {
-                                case 'center':
-                                    if (mapOptions.center.lat !== undefined && mapOptions.center.lng !== undefined) {
-                                        initMapOptions.center = new naver.maps.LatLng(mapOptions.center.lat, mapOptions.center.lng);
-                                    } else if (mapOptions.center.x !== undefined && mapOptions.center.y !== undefined) {
-                                        initMapOptions.center = new naver.maps.Point(mapOptions.center.x, mapOptions.center.y);
-                                    }
-                                    break;
-                                case 'bounds':
-                                    if (mapOptions.bounds.southWest && mapOptions.bounds.northEast) {
-                                        initMapOptions.bounds = new naver.maps.LatLngBounds(
-                                            new naver.maps.LatLng(mapOptions.bounds.southWest.lat, mapOptions.bounds.southWest.lng),
-                                            new naver.maps.LatLng(mapOptions.bounds.northEast.lat, mapOptions.bounds.northEast.lng)
-                                        );
-                                    } else if (mapOptions.bounds.min && mapOptions.bounds.max) {
-                                        initMapOptions.bounds = new naver.maps.PointBounds(
-                                            new naver.maps.Point(mapOptions.bounds.min.x, mapOptions.bounds.min.y),
-                                            new naver.maps.Point(mapOptions.bounds.max.x, mapOptions.bounds.max.y)
-                                        );
-                                    }
-                                    break;
-                                case 'maxBounds':
-                                    if (mapOptions.maxBounds.southWest && mapOptions.maxBounds.northEast) {
-                                        initMapOptions.maxBounds = new naver.maps.LatLngBounds(
-                                            new naver.maps.LatLng(mapOptions.maxBounds.southWest.lat, mapOptions.maxBounds.southWest.lng),
-                                            new naver.maps.LatLng(mapOptions.maxBounds.northEast.lat, mapOptions.maxBounds.northEast.lng)
-                                        );
-                                    } else if (mapOptions.maxBounds.min && mapOptions.maxBounds.max) {
-                                        initMapOptions.maxBounds = new naver.maps.PointBounds(
-                                            new naver.maps.Point(mapOptions.maxBounds.min.x, mapOptions.maxBounds.min.y),
-                                            new naver.maps.Point(mapOptions.maxBounds.max.x, mapOptions.maxBounds.max.y)
-                                        );
-                                    }
-                                    break;
-                                case 'padding':
-                                    initMapOptions.padding = {
-                                        top: mapOptions.padding.top,
-                                        right: mapOptions.padding.right,
-                                        bottom: mapOptions.padding.bottom,
-                                        left: mapOptions.padding.left
-                                    };
-                                    break;
-                                case 'size':
-                                    initMapOptions.size = new naver.maps.Size(mapOptions.size.width, mapOptions.size.height);
-                                    break;
-                                case 'zoomOrigin':
-                                     if (mapOptions.zoomOrigin) {
-                                        if (mapOptions.zoomOrigin.lat !== undefined && mapOptions.zoomOrigin.lng !== undefined) {
-                                            initMapOptions.zoomOrigin = new naver.maps.LatLng(mapOptions.zoomOrigin.lat, mapOptions.zoomOrigin.lng);
-                                        } else if (mapOptions.zoomOrigin.x !== undefined && mapOptions.zoomOrigin.y !== undefined) {
-                                            initMapOptions.zoomOrigin = new naver.maps.Point(mapOptions.zoomOrigin.x, mapOptions.zoomOrigin.y);
-                                        }
-                                     }
-                                    break;
-                                case 'resizeOrigin':
-                                    initMapOptions.resizeOrigin = getNaverPosition(mapOptions.resizeOrigin);
-                                    break;
-                                case 'zoomControlOptions':
-                                    initMapOptions.zoomControlOptions = {
-                                        ...mapOptions.zoomControlOptions,
-                                        position: getNaverPosition(mapOptions.zoomControlOptions.position),
-                                        style: mapOptions.zoomControlOptions.style === 'LARGE' ? naver.maps.ZoomControlStyle.LARGE : naver.maps.ZoomControlStyle.SMALL
-                                    };
-                                    break;
-                                case 'mapTypeControlOptions':
-                                    {
-                                        const opts = mapOptions.mapTypeControlOptions;
-                                        const newOpts = {};
-                                        if (opts.position) newOpts.position = getNaverPosition(opts.position);
-                                        if (opts.style) newOpts.style = opts.style === 'DROPDOWN' ? naver.maps.MapTypeControlStyle.DROPDOWN : naver.maps.MapTypeControlStyle.BUTTONS;
-                                        if (opts.mapTypeIds) {
-                                            newOpts.mapTypeIds = opts.mapTypeIds
-                                                .map(idStr => getNaverMapTypeId(idStr))
-                                                .filter(Boolean);
-                                        }
-                                        initMapOptions.mapTypeControlOptions = newOpts;
-                                    }
-                                    break;
-                                case 'mapTypeId':
-                                    initMapOptions.mapTypeId = getNaverMapTypeId(mapOptions.mapTypeId);
-                                    break;
-                                case 'mapDataControlOptions':
-                                case 'logoControlOptions':
-                                case 'scaleControlOptions':
-                                    initMapOptions[key] = {
-                                        ...mapOptions[key],
-                                        position: getNaverPosition(mapOptions[key].position)
-                                    };
-                                    break;
-                                default:
-                                    initMapOptions[key] = mapOptions[key];
-                                    break;
-                            }
-                        }
-                    }
-                }
-
-                map = new naver.maps.Map('map', initMapOptions);
+                map = new naver.maps.Map('map', mapOptions);
 
                 if (window.FlutterMethodChannel) {
                     window.FlutterMethodChannel.postMessage(JSON.stringify({type: 'mapLoaded'}));

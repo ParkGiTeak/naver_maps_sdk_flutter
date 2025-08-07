@@ -1,7 +1,7 @@
 enum NaverMapZoomControlStyle {
-  large('LARGE'),
-  small('SMALL');
+  large(1),
+  small(2);
 
   const NaverMapZoomControlStyle(this.value);
-  final String value;
+  final int value;
 }
