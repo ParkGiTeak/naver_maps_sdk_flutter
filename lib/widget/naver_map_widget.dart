@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:naver_maps_sdk_flutter/listener/map_load_status_listener.dart';
+import 'package:naver_maps_sdk_flutter/listener/marker_event_listener.dart';
 import 'package:naver_maps_sdk_flutter/manager/naver_map_manager.dart';
 import 'package:naver_maps_sdk_flutter/model/map_options.dart';
 import 'package:naver_maps_sdk_flutter/naver_maps_sdk_flutter.dart';
@@ -10,19 +11,22 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 class NaverMapWidget extends StatelessWidget {
   final MapOptions? _mapOptions;
-  final MapLoadStatusListener _listener;
+  final MapLoadStatusListener _mapLoadStatusListener;
+  final MarkerEventListener _markerEventListener;
   late final String _applyScriptHtmlContent;
 
   final WebViewController _controller = WebViewController();
 
-  MapLoadStatusListener? get listener => _listener;
+  MapLoadStatusListener? get listener => _mapLoadStatusListener;
 
   NaverMapWidget({
     super.key,
     MapOptions? mapOptions,
-    required MapLoadStatusListener listener,
+    required MapLoadStatusListener mapLoadStatusListener,
+    required MarkerEventListener markerEventListener,
   }) : _mapOptions = mapOptions,
-       _listener = listener;
+       _mapLoadStatusListener = mapLoadStatusListener,
+       _markerEventListener = markerEventListener;
 
   @override
   Widget build(BuildContext context) {
@@ -69,12 +73,23 @@ class NaverMapWidget extends StatelessWidget {
             final String type = data['type'];
 
             if (type == 'mapLoaded') {
-              _listener.onMapLoadSuccess(NaverMapManager(_controller));
+              _mapLoadStatusListener.onMapLoadSuccess(
+                NaverMapManager(_controller),
+              );
             } else if (type == 'mapLoadFail') {
-              _listener.onMapLoadFail();
+              _mapLoadStatusListener.onMapLoadFail();
             }
           } catch (e) {
-            _listener.onMapLoadFail();
+            _mapLoadStatusListener.onMapLoadFail();
+          }
+        },
+      )
+      ..addJavaScriptChannel(
+        'MarkerEvent',
+        onMessageReceived: (JavaScriptMessage message) {
+          final Map<String, dynamic> json = jsonDecode(message.message);
+          if (json['type'] == 'markerClick') {
+            _markerEventListener.onMarkerClick(json['markerId']);
           }
         },
       )

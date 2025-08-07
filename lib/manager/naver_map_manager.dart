@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:naver_maps_sdk_flutter/listener/marker_event_listener.dart';
 import 'package:naver_maps_sdk_flutter/model/coord.dart';
+import 'package:naver_maps_sdk_flutter/model/marker_options.dart';
 import 'package:naver_maps_sdk_flutter/model/n_lat_lng.dart';
 import 'package:naver_maps_sdk_flutter/model/n_point.dart';
 import 'package:naver_maps_sdk_flutter/util/ns_dictionary_util.dart';
@@ -41,5 +43,50 @@ class NaverMapManager {
 
   Future<void> setZoom({required int zoom}) async {
     await _controller.runJavaScript('map.setZoom($zoom)');
+  }
+
+  Future<void> addMarker({
+    required int markerId,
+    required MarkerOptions markerOptions,
+  }) async {
+    await _controller.runJavaScript(
+      'window.addMarker($markerId, ${markerOptions.toJson()})',
+    );
+  }
+
+  Future<void> updateMarker({
+    required int markerId,
+    required MarkerOptions markerOptions,
+  }) async {
+    await _controller.runJavaScript(
+      'window.updateMarker($markerId, ${markerOptions.toJson()})',
+    );
+  }
+
+  Future<void> removeMarker({required int markerId}) async {
+    await _controller.runJavaScript('window.removeMarker($markerId)');
+  }
+
+  Future<void> removeMarkerAll() async {
+    await _controller.runJavaScript('window.removeMarkerAll()');
+  }
+
+  Future<List<int>> getMarkerIds() async {
+    String jsonStringResult =
+        await _controller.runJavaScriptReturningResult('window.getMarkerIds()')
+            as String;
+    if (Platform.isIOS) {
+      jsonStringResult = NSDictionaryUtil.convert(jsonStringResult);
+    }
+    final List<int> markerIds = jsonDecode(jsonStringResult) as List<int>;
+    return markerIds;
+  }
+
+  Future<void> addMarkerClickEvent({required int markerId}) async {
+    await _controller.runJavaScript('window.addMarkerClickEvent($markerId)');
+  }
+
+  Future<void> removeMarkerClickEvent({required int markerId}) async {
+    await _controller.runJavaScript('window.removeMarkerClickEvent($markerId)');
   }
 }

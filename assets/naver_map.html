@@ -24,6 +24,8 @@
 
         <script type="text/javascript">
             let map;
+            let markers = new Map();
+            let markerEventListeners = new Map();
 
             function initMap(mapOptions = null) {
                 console.log("Naver Map Init Call", mapOptions);
@@ -38,6 +40,69 @@
                 if (window.FlutterMethodChannel) {
                     window.FlutterMethodChannel.postMessage(JSON.stringify({type: 'mapLoaded'}));
                     console.log("MapLoaded Send Flutter");
+                }
+            }
+
+            function addMarker(markerId, markerOptions) {
+                if (map) {
+                    if (markers.has(markerId)) {
+                        markers.get(markerId).setMap(null);
+                        markers.delete(markerId);
+                    }
+                    const initMarkerOptions = {
+                        map: map,
+                        ...markerOptions
+                    };
+                    let marker = new naver.maps.Marker(initMarkerOptions);
+                    markers.set(markerId, marker);
+                }
+            }
+
+            function updateMarker(markerId, markerOptions) {
+                if (markers.has(markerId)) {
+                    const initMarkerOptions = {
+                        map: map,
+                        ...markerOptions
+                    };
+                    markers.get(markerId).setOptions(initMarkerOptions);
+                }
+            }
+
+            function removeMarker(markerId) {
+                if (markers.has(markerId)) {
+                    markers.get(markerId).setMap(null);
+                    markers.delete(markerId);
+                }
+            }
+
+            function removeMarkerAll() {
+                markers.forEach((marker) => marker.setMap(null));
+                markers.clear();
+            }
+
+            function getMarkerIds() {
+                return Array.from(markers.keys());
+            }
+
+            function addMarkerClickEvent(markerId) {
+                if (markers.has(markerId)) {
+                    if (markerEventListeners.has(markerId)) {
+                        markerEventListeners.get(markerId).remove();
+                        markerEventListeners.delete(markerId);
+                    }
+                    const listener = naver.maps.Event.addListener(markers.get(markerId), 'click', function() {
+                        window.MarkerEvent.postMessage(JSON.stringify({type: 'markerClick', markerId: markerId}));
+                    });
+                    markerEventListeners.set(markerId, listener);
+                }
+            }
+
+            function removeMarkerClickEvent(markerId) {
+                if (markers.has(markerId)) {
+                    if (markerEventListeners.has(markerId)) {
+                        markerEventListeners.get(markerId).remove();
+                        markerEventListeners.delete(markerId);
+                    }
                 }
             }
         </script>
