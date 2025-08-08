@@ -2,14 +2,14 @@ import 'dart:convert';
 
 import 'package:naver_maps_sdk_flutter/enum/n_animation.dart';
 import 'package:naver_maps_sdk_flutter/model/coord.dart';
-import 'package:naver_maps_sdk_flutter/model/n_image_icon.dart';
+import 'package:naver_maps_sdk_flutter/model/n_icon.dart';
 import 'package:naver_maps_sdk_flutter/model/marker_shape.dart';
 import 'package:naver_maps_sdk_flutter/model/n_size.dart';
 
 class MarkerOptions {
   final NAnimation? animation;
   final Coord position;
-  final NImageIcon? icon;
+  final NIcon? icon;
   final MarkerShape? shape;
   final String? title;
   final String? cursor;
@@ -47,8 +47,10 @@ class MarkerOptions {
       if (draggable != null) 'draggable': jsonEncode(draggable),
       if (visible != null) 'visible': jsonEncode(visible),
       if (zIndex != null) 'zIndex': jsonEncode(zIndex),
-      if (collisionBehavior != null) 'collisionBehavior': jsonEncode(collisionBehavior),
-      if (collisionBoxSize != null) 'collisionBoxSize': collisionBoxSize!.toJson(),
+      if (collisionBehavior != null)
+        'collisionBehavior': jsonEncode(collisionBehavior),
+      if (collisionBoxSize != null)
+        'collisionBoxSize': collisionBoxSize!.toJson(),
     };
   }
 }

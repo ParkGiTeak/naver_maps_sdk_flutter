@@ -4,28 +4,20 @@ import 'package:naver_maps_sdk_flutter/model/n_icon.dart';
 import 'package:naver_maps_sdk_flutter/model/n_point.dart';
 import 'package:naver_maps_sdk_flutter/model/n_size.dart';
 
-class NImageIcon implements NIcon {
-  final String url;
+class HtmlIcon implements NIcon {
+  final String content;
+
   final NSize? size;
-  final NSize? scaledSize;
-  final NPoint? origin;
+
   final NPoint? anchor;
 
-  const NImageIcon({
-    required this.url,
-    this.size,
-    this.scaledSize,
-    this.origin,
-    this.anchor,
-  });
+  const HtmlIcon({required this.content, this.size, this.anchor});
 
   @override
   Map<String, dynamic> toJson() {
     return {
-      'url': jsonEncode(url),
+      'content': jsonEncode(content),
       if (size != null) 'size': size!.toJson(),
-      if (scaledSize != null) 'scaledSize': scaledSize!.toJson(),
-      if (origin != null) 'origin': origin!.toJson(),
       if (anchor != null) 'anchor': anchor!.toJson(),
     };
   }
