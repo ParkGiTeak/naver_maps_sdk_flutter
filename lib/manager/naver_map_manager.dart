@@ -1,23 +1,13 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:naver_maps_sdk_flutter/listener/marker_event_listener.dart';
-import 'package:naver_maps_sdk_flutter/model/coord.dart';
-import 'package:naver_maps_sdk_flutter/model/marker_options.dart';
-import 'package:naver_maps_sdk_flutter/model/n_lat_lng.dart';
-import 'package:naver_maps_sdk_flutter/model/n_point.dart';
-import 'package:naver_maps_sdk_flutter/util/ns_dictionary_util.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-
+part of '../naver_maps_sdk_flutter.dart';
 class NaverMapManager {
-  final WebViewController _controller;
+  final WebViewController _controller = WebViewController();
 
-  NaverMapManager(WebViewController controller) : _controller = controller;
+  NaverMapManager._internal();
 
   Future<Coord> getCenter({required bool resultTypeLatLng}) async {
     String jsonStringResult =
-        await _controller.runJavaScriptReturningResult('map.getCenter()')
-            as String;
+    await _controller.runJavaScriptReturningResult('map.getCenter()')
+    as String;
     if (Platform.isIOS) {
       jsonStringResult = NSDictionaryUtil.convert(jsonStringResult);
     }
@@ -33,7 +23,7 @@ class NaverMapManager {
 
   Future<int> getZoom() async {
     final num jsonStringResult =
-        await _controller.runJavaScriptReturningResult('map.getZoom()') as num;
+    await _controller.runJavaScriptReturningResult('map.getZoom()') as num;
     return jsonStringResult.toInt();
   }
 
@@ -73,8 +63,8 @@ class NaverMapManager {
 
   Future<List<int>> getMarkerIds() async {
     String jsonStringResult =
-        await _controller.runJavaScriptReturningResult('window.getMarkerIds()')
-            as String;
+    await _controller.runJavaScriptReturningResult('window.getMarkerIds()')
+    as String;
     if (Platform.isIOS) {
       jsonStringResult = NSDictionaryUtil.convert(jsonStringResult);
     }

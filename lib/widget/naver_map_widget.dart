@@ -1,26 +1,18 @@
-import 'dart:convert';
-
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:naver_maps_sdk_flutter/listener/map_load_status_listener.dart';
-import 'package:naver_maps_sdk_flutter/listener/marker_event_listener.dart';
-import 'package:naver_maps_sdk_flutter/manager/naver_map_manager.dart';
-import 'package:naver_maps_sdk_flutter/model/map_options.dart';
-import 'package:naver_maps_sdk_flutter/naver_maps_sdk_flutter.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+part of '../naver_maps_sdk_flutter.dart';
 
 class NaverMapWidget extends StatelessWidget {
   final MapOptions? _mapOptions;
+
   final MapLoadStatusListener _mapLoadStatusListener;
   final MarkerEventListener _markerEventListener;
-  late final String _applyScriptHtmlContent;
 
-  final WebViewController _controller = WebViewController();
+  final NaverMapManager naverMapManager;
 
   MapLoadStatusListener? get listener => _mapLoadStatusListener;
 
-  NaverMapWidget({
+  const NaverMapWidget({
     super.key,
+    required this.naverMapManager,
     MapOptions? mapOptions,
     required MapLoadStatusListener mapLoadStatusListener,
     required MarkerEventListener markerEventListener,
@@ -37,14 +29,14 @@ class NaverMapWidget extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         } else {
           _initializeWebViewController();
-          return WebViewWidget(controller: _controller);
+          return WebViewWidget(controller: naverMapManager._controller);
         }
       },
     );
   }
 
-  void _initializeWebViewController() {
-    _controller
+  void _initializeWebViewController() async {
+    naverMapManager._controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(
@@ -73,9 +65,7 @@ class NaverMapWidget extends StatelessWidget {
             final String type = data['type'];
 
             if (type == 'mapLoaded') {
-              _mapLoadStatusListener.onMapLoadSuccess(
-                NaverMapManager(_controller),
-              );
+              _mapLoadStatusListener.onMapLoadSuccess();
             } else if (type == 'mapLoadFail') {
               _mapLoadStatusListener.onMapLoadFail();
             }
@@ -94,12 +84,12 @@ class NaverMapWidget extends StatelessWidget {
         },
       )
       ..loadHtmlString(
-        _applyScriptHtmlContent,
+        await _initNaverScript(),
         baseUrl: NaverMapSDK.instance.webServiceUrl,
       );
   }
 
-  Future<void> _initNaverScript() async {
+  Future<String> _initNaverScript() async {
     final String beforeHtmlContent = await rootBundle.loadString(
       'packages/naver_maps_sdk_flutter/assets/naver_map.html',
     );
@@ -108,7 +98,7 @@ class NaverMapWidget extends StatelessWidget {
         '<script id="naverMapScript" type="text/javascript"></script>';
     final String scriptNaverWithClientId =
         '<script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${NaverMapSDK.instance.clientId}&language=${NaverMapSDK.instance.language.value}"></script>';
-    _applyScriptHtmlContent = beforeHtmlContent.replaceFirst(
+    return beforeHtmlContent.replaceFirst(
       scriptPlaceHolder,
       scriptNaverWithClientId,
     );
@@ -116,6 +106,8 @@ class NaverMapWidget extends StatelessWidget {
 
   Future<void> _initializeNaverMap(MapOptions? mapOptions) async {
     debugPrint('mapOptions:: ${mapOptions?.toJson() ?? '{}'}');
-    await _controller.runJavaScript('initMap(${mapOptions?.toJson() ?? '{}'})');
+    await naverMapManager._controller.runJavaScript(
+      'initMap(${mapOptions?.toJson() ?? '{}'})',
+    );
   }
 }
