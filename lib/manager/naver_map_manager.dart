@@ -1,13 +1,37 @@
 part of '../naver_maps_sdk_flutter.dart';
+
 class NaverMapManager {
   final WebViewController _controller = WebViewController();
 
+  final _mapLoadStatusController = StreamController<MapLoadStatus>.broadcast();
+  final _markerEventController = StreamController<MarkerEvent>.broadcast();
+
+  Stream<MapLoadStatus> get onMapLoadStatus => _mapLoadStatusController.stream;
+  Stream<MarkerEvent> get onMarkerEvent => _markerEventController.stream;
+
   NaverMapManager._internal();
+
+  void onMapLoadSuccess() {
+    _mapLoadStatusController.add(const MapLoadSuccess());
+  }
+
+  void onMapLoadFail() {
+    _mapLoadStatusController.add(const MapLoadFail());
+  }
+
+  void onMarkerClick(int markerId) {
+    _markerEventController.add(MarkerClick(markerId));
+  }
+
+  void dispose() {
+    _mapLoadStatusController.close();
+    _markerEventController.close();
+  }
 
   Future<Coord> getCenter({required bool resultTypeLatLng}) async {
     String jsonStringResult =
-    await _controller.runJavaScriptReturningResult('map.getCenter()')
-    as String;
+        await _controller.runJavaScriptReturningResult('map.getCenter()')
+            as String;
     if (Platform.isIOS) {
       jsonStringResult = NSDictionaryUtil.convert(jsonStringResult);
     }
@@ -23,7 +47,7 @@ class NaverMapManager {
 
   Future<int> getZoom() async {
     final num jsonStringResult =
-    await _controller.runJavaScriptReturningResult('map.getZoom()') as num;
+        await _controller.runJavaScriptReturningResult('map.getZoom()') as num;
     return jsonStringResult.toInt();
   }
 
@@ -63,13 +87,13 @@ class NaverMapManager {
 
   Future<List<int>> getMarkerIds() async {
     String jsonStringResult =
-    await _controller.runJavaScriptReturningResult('window.getMarkerIds()')
-    as String;
+        await _controller.runJavaScriptReturningResult('window.getMarkerIds()')
+            as String;
     if (Platform.isIOS) {
       jsonStringResult = NSDictionaryUtil.convert(jsonStringResult);
     }
-    final List<int> markerIds = jsonDecode(jsonStringResult) as List<int>;
-    return markerIds;
+    final List<dynamic> markerIds = jsonDecode(jsonStringResult);
+    return markerIds.cast<int>();
   }
 
   Future<void> addMarkerClickEvent({required int markerId}) async {

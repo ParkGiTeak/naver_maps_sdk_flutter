@@ -3,36 +3,18 @@ part of '../naver_maps_sdk_flutter.dart';
 class NaverMapWidget extends StatelessWidget {
   final MapOptions? _mapOptions;
 
-  final MapLoadStatusListener _mapLoadStatusListener;
-  final MarkerEventListener _markerEventListener;
-
   final NaverMapManager naverMapManager;
-
-  MapLoadStatusListener? get listener => _mapLoadStatusListener;
 
   const NaverMapWidget({
     super.key,
     required this.naverMapManager,
     MapOptions? mapOptions,
-    required MapLoadStatusListener mapLoadStatusListener,
-    required MarkerEventListener markerEventListener,
-  }) : _mapOptions = mapOptions,
-       _mapLoadStatusListener = mapLoadStatusListener,
-       _markerEventListener = markerEventListener;
+  }) : _mapOptions = mapOptions;
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<void>(
-      future: _initNaverScript(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else {
-          _initializeWebViewController();
-          return WebViewWidget(controller: naverMapManager._controller);
-        }
-      },
-    );
+    _initializeWebViewController();
+    return WebViewWidget(controller: naverMapManager._controller);
   }
 
   void _initializeWebViewController() async {
@@ -52,7 +34,7 @@ class NaverMapWidget extends StatelessWidget {
             _initializeNaverMap(_mapOptions);
           },
           onWebResourceError: (WebResourceError error) {
-            debugPrint('WebView Error:: $error');
+            debugPrint('WebView Error:: ${error.description}');
           },
         ),
       )
@@ -65,12 +47,12 @@ class NaverMapWidget extends StatelessWidget {
             final String type = data['type'];
 
             if (type == 'mapLoaded') {
-              _mapLoadStatusListener.onMapLoadSuccess();
+              naverMapManager.onMapLoadSuccess();
             } else if (type == 'mapLoadFail') {
-              _mapLoadStatusListener.onMapLoadFail();
+              naverMapManager.onMapLoadFail();
             }
           } catch (e) {
-            _mapLoadStatusListener.onMapLoadFail();
+            naverMapManager.onMapLoadFail();
           }
         },
       )
@@ -79,7 +61,7 @@ class NaverMapWidget extends StatelessWidget {
         onMessageReceived: (JavaScriptMessage message) {
           final Map<String, dynamic> json = jsonDecode(message.message);
           if (json['type'] == 'markerClick') {
-            _markerEventListener.onMarkerClick(json['markerId']);
+            naverMapManager.onMarkerClick(json['markerId']);
           }
         },
       )
