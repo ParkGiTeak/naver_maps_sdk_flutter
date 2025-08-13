@@ -26,6 +26,7 @@
             let map;
             let markers = new Map();
             let markerEventListeners = new Map();
+            let mapEventListeners = new Map();
 
             function initMap(mapOptions = null) {
                 console.log("Naver Map Init Call", mapOptions);
@@ -39,7 +40,6 @@
 
                 if (window.FlutterMethodChannel) {
                     window.FlutterMethodChannel.postMessage(JSON.stringify({type: 'mapLoaded'}));
-                    console.log("MapLoaded Send Flutter");
                 }
             }
 
@@ -118,6 +118,132 @@
                     new naver.maps.Point(pointBounds.max.x, pointBounds.max.y)
                 );
                 return bounds.hasPoint(point);
+            }
+
+            function addMapClickEventListener() {
+                if (mapEventListeners.has('click')) {
+                    return;
+                }
+                const listener = naver.maps.Event.addListener(map, 'click', function(pointerEvent) {
+                    window.MapEvent.postMessage(JSON.stringify({type: 'click', coord: pointerEvent.coord}));
+                });
+                mapEventListeners.set('click', listener);
+            }
+
+            function removeMapClickEventListener() {
+                if (mapEventListeners.has('click')) {
+                    const listener = mapEventListeners.get('click');
+                    naver.maps.Event.removeListener(listener);
+                    mapEventListeners.delete('click');
+                }
+            }
+
+            function addMapLongTapEventListener() {
+                if (mapEventListeners.has('longtap')) {
+                    return;
+                }
+                const listener = naver.maps.Event.addListener(map, 'longtap', function(pointerEvent) {
+                    window.MapEvent.postMessage(JSON.stringify({type: 'longtap', coord: pointerEvent.coord}));
+                });
+                mapEventListeners.set('longtap', listener);
+            }
+
+            function removeMapLongTapEventListener() {
+                if (mapEventListeners.has('longtap')) {
+                    const listener = mapEventListeners.get('longtap');
+                    naver.maps.Event.removeListener(listener);
+                    mapEventListeners.delete('longtap');
+                }
+            }
+
+            function addMapIdleEventListener() {
+                if (mapEventListeners.has('idle')) {
+                    return;
+                }
+                const listener = naver.maps.Event.addListener(map, 'idle', function() {
+                    window.MapEvent.postMessage(JSON.stringify({type: 'idle'}));
+                });
+                mapEventListeners.set('idle', listener);
+            }
+
+            function removeMapIdleEventListener() {
+                if (mapEventListeners.has('idle')) {
+                    const listener = mapEventListeners.get('idle');
+                    naver.maps.Event.removeListener(listener);
+                    mapEventListeners.delete('idle');
+                }
+            }
+
+            function addMapZoomChangedEventListener() {
+                if (mapEventListeners.has('zoom_changed')) {
+                    return;
+                }
+                const listener = naver.maps.Event.addListener(map, 'zoom_changed', function(zoom) {
+                    window.MapEvent.postMessage(JSON.stringify({type: 'zoom_changed', zoom: zoom}));
+                });
+                mapEventListeners.set('zoom_changed', listener);
+            }
+
+            function removeMapZoomChangedEventListener() {
+                if (mapEventListeners.has('zoom_changed')) {
+                    const listener = mapEventListeners.get('zoom_changed');
+                    naver.maps.Event.removeListener(listener);
+                    mapEventListeners.delete('zoom_changed');
+                }
+            }
+
+            function addMapZoomEndEventListener() {
+                if (mapEventListeners.has('zoomend')) {
+                    return;
+                }
+                const listener = naver.maps.Event.addListener(map, 'zoomend', function() {
+                    window.MapEvent.postMessage(JSON.stringify({type: 'zoomend'}));
+                });
+                mapEventListeners.set('zoomend', listener);
+            }
+
+            function removeMapZoomEndEventListener() {
+                if (mapEventListeners.has('zoomend')) {
+                    const listener = mapEventListeners.get('zoomend');
+                    naver.maps.Event.removeListener(listener);
+                    mapEventListeners.delete('zoomend');
+                }
+            }
+
+            function addMapZoomStartEventListener() {
+                if (mapEventListeners.has('zoomstart')) {
+                    return;
+                }
+                const listener = naver.maps.Event.addListener(map, 'zoomstart', function() {
+                    window.MapEvent.postMessage(JSON.stringify({type: 'zoomstart'}));
+                });
+                mapEventListeners.set('zoomstart', listener);
+            }
+
+            function removeMapZoomStartEventListener() {
+                if (mapEventListeners.has('zoomstart')) {
+                    const listener = mapEventListeners.get('zoomstart');
+                    naver.maps.Event.removeListener(listener);
+                    mapEventListeners.delete('zoomstart');
+                }
+            }
+
+            function addMapCenterChangedEventListener() {
+                if (mapEventListeners.has('center_changed')) {
+                    return;
+                }
+                const listener = naver.maps.Event.addListener(map, 'center_changed', function(center) {
+                    window.MapEvent.postMessage(JSON.stringify({type: 'center_changed', center: center}));
+                });
+                mapEventListeners.set('center_changed', listener);
+            }
+
+            function removeMapCenterChangedEventListener() {
+                if (mapEventListeners.has('center_changed')) {
+                    const listener = mapEventListeners.get('center_changed');
+                    naver.maps.Event.removeListener(listener);
+                    mapEventListeners.delete('center_changed');
+                }
             }
         </script>
     </body>

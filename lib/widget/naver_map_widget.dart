@@ -65,6 +65,36 @@ class NaverMapWidget extends StatelessWidget {
           }
         },
       )
+      ..addJavaScriptChannel(
+        'MapEvent',
+        onMessageReceived: (JavaScriptMessage message) {
+          final Map<String, dynamic> json = jsonDecode(message.message);
+          final String type = json['type'];
+          switch (type) {
+            case 'click':
+              naverMapManager.onMapClick(json['coord']);
+              break;
+            case 'longtap':
+              naverMapManager.onMapLongTap(json['coord']);
+              break;
+            case 'idle':
+              naverMapManager.onMapIdle();
+              break;
+            case 'zoom_changed':
+              naverMapManager.onMapZoomChanged(json['zoom']);
+              break;
+            case 'zoomend':
+              naverMapManager.onMapZoomEnd();
+              break;
+            case 'zoomstart':
+              naverMapManager.onMapZoomStart();
+              break;
+            case 'center_changed':
+              naverMapManager.onMapCenterChanged(json['center']);
+              break;
+          }
+        },
+      )
       ..loadHtmlString(
         await _initNaverScript(),
         baseUrl: NaverMapSDK.instance.webServiceUrl,

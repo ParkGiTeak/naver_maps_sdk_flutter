@@ -3,30 +3,77 @@ part of '../naver_maps_sdk_flutter.dart';
 class NaverMapManager {
   final WebViewController _controller = WebViewController();
 
-  final _mapLoadStatusController = StreamController<MapLoadStatus>.broadcast();
-  final _markerEventController = StreamController<MarkerEvent>.broadcast();
+  StreamController<MapLoadStatus>? _mapLoadStatusController;
+  StreamController<MarkerEvent>? _markerEventController;
+  StreamController<MapEvent>? _mapEventController;
 
-  Stream<MapLoadStatus> get onMapLoadStatus => _mapLoadStatusController.stream;
+  Stream<MapLoadStatus> get onMapLoadStatus {
+    _mapLoadStatusController = StreamController<MapLoadStatus>.broadcast();
+    return _mapLoadStatusController!.stream;
+  }
 
-  Stream<MarkerEvent> get onMarkerEvent => _markerEventController.stream;
+  Stream<MarkerEvent> get onMarkerEvent {
+    _markerEventController = StreamController<MarkerEvent>.broadcast();
+    return _markerEventController!.stream;
+  }
+
+  Stream<MapEvent> get onMapEvent {
+    _mapEventController = StreamController<MapEvent>.broadcast();
+    return _mapEventController!.stream;
+  }
 
   NaverMapManager._internal();
 
   void onMapLoadSuccess() {
-    _mapLoadStatusController.add(const MapLoadSuccess());
+    _mapLoadStatusController?.add(const MapLoadSuccess());
   }
 
   void onMapLoadFail() {
-    _mapLoadStatusController.add(const MapLoadFail());
+    _mapLoadStatusController?.add(const MapLoadFail());
   }
 
   void onMarkerClick(int markerId) {
-    _markerEventController.add(MarkerClick(markerId));
+    _markerEventController?.add(MarkerClick(markerId));
+  }
+
+  void onMapClick(Map<String, dynamic> coord) {
+    final NLatLng latLng = NLatLng(coord['_lat'], coord['_lng']);
+    final NPoint point = NPoint(coord['x'], coord['y']);
+    _mapEventController?.add(MapClick(latLng, point));
+  }
+
+  void onMapLongTap(Map<String, dynamic> coord) {
+    final NLatLng latLng = NLatLng(coord['_lat'], coord['_lng']);
+    final NPoint point = NPoint(coord['x'], coord['y']);
+    _mapEventController?.add(MapLongTap(latLng, point));
+  }
+
+  void onMapIdle() {
+    _mapEventController?.add(const MapIdle());
+  }
+
+  void onMapZoomChanged(int zoom) {
+    _mapEventController?.add(MapZoomChanged(zoom));
+  }
+
+  void onMapZoomEnd() {
+    _mapEventController?.add(const MapZoomEnd());
+  }
+
+  void onMapZoomStart() {
+    _mapEventController?.add(const MapZoomStart());
+  }
+
+  void onMapCenterChanged(Map<String, dynamic> center) {
+    final NLatLng latLng = NLatLng(center['_lat'], center['_lng']);
+    final NPoint point = NPoint(center['x'], center['y']);
+    _mapEventController?.add(MapCenterChanged(latLng, point));
   }
 
   void dispose() {
-    _mapLoadStatusController.close();
-    _markerEventController.close();
+    _mapLoadStatusController?.close();
+    _markerEventController?.close();
+    _mapEventController?.close();
   }
 
   Future<Coord> getCenter({required bool resultTypeLatLng}) async {
@@ -150,5 +197,67 @@ class NaverMapManager {
 
   Future<void> removeMarkerClickEvent({required int markerId}) async {
     await _controller.runJavaScript('window.removeMarkerClickEvent($markerId)');
+  }
+
+  Future<void> addMapClickEventListener() async {
+    await _controller.runJavaScript('window.addMapClickEventListener()');
+  }
+
+  Future<void> removeMapClickEventListener() async {
+    await _controller.runJavaScript('window.removeMapClickEventListener()');
+  }
+
+  Future<void> addMapLongTapEventListener() async {
+    await _controller.runJavaScript('window.addMapLongTapEventListener()');
+  }
+
+  Future<void> removeMapLongTapEventListener() async {
+    await _controller.runJavaScript('window.removeMapLongTapEventListener()');
+  }
+
+  Future<void> addMapIdleEventListener() async {
+    await _controller.runJavaScript('window.addMapIdleEventListener()');
+  }
+
+  Future<void> removeMapIdleEventListener() async {
+    await _controller.runJavaScript('window.removeMapIdleEventListener()');
+  }
+
+  Future<void> addMapZoomChangedEventListener() async {
+    await _controller.runJavaScript('window.addMapZoomChangedEventListener()');
+  }
+
+  Future<void> removeMapZoomChangedEventListener() async {
+    await _controller.runJavaScript(
+      'window.removeMapZoomChangedEventListener()',
+    );
+  }
+
+  Future<void> addMapZoomEndEventListener() async {
+    await _controller.runJavaScript('window.addMapZoomEndEventListener()');
+  }
+
+  Future<void> removeMapZoomEndEventListener() async {
+    await _controller.runJavaScript('window.removeMapZoomEndEventListener()');
+  }
+
+  Future<void> addMapZoomStartEventListener() async {
+    await _controller.runJavaScript('window.addMapZoomStartEventListener()');
+  }
+
+  Future<void> removeMapZoomStartEventListener() async {
+    await _controller.runJavaScript('window.removeMapZoomStartEventListener()');
+  }
+
+  Future<void> addMapCenterChangedEventListener() async {
+    await _controller.runJavaScript(
+      'window.addMapCenterChangedEventListener()',
+    );
+  }
+
+  Future<void> removeMapCenterChangedEventListener() async {
+    await _controller.runJavaScript(
+      'window.removeMapCenterChangedEventListener()',
+    );
   }
 }
