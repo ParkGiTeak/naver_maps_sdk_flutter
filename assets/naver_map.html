@@ -105,6 +105,22 @@
                     }
                 }
             }
+
+            function hasLatLng(latLngBounds, latLng) {
+                const bounds = new naver.maps.LatLngBounds(
+                    new naver.maps.LatLng(latLngBounds.southWest.lat, latLngBounds.southWest.lng),
+                    new naver.maps.LatLng(latLngBounds.northEast.lat, latLngBounds.northEast.lng)
+                );
+                return bounds.hasLatLng(latLng);
+            }
+
+            function hasPoint(pointBounds, point) {
+                const bounds = new naver.maps.PointBounds(
+                    new naver.maps.Point(pointBounds.min.x, pointBounds.min.y),
+                    new naver.maps.Point(pointBounds.max.x, pointBounds.max.y)
+                );
+                return bounds.hasPoint(point);
+            }
         </script>
     </body>
 </html>

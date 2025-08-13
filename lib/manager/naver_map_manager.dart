@@ -7,6 +7,7 @@ class NaverMapManager {
   final _markerEventController = StreamController<MarkerEvent>.broadcast();
 
   Stream<MapLoadStatus> get onMapLoadStatus => _mapLoadStatusController.stream;
+
   Stream<MarkerEvent> get onMarkerEvent => _markerEventController.stream;
 
   NaverMapManager._internal();
@@ -49,6 +50,53 @@ class NaverMapManager {
     final num jsonStringResult =
         await _controller.runJavaScriptReturningResult('map.getZoom()') as num;
     return jsonStringResult.toInt();
+  }
+
+  Future<Bounds> getBounds({required bool resultTypeLatLng}) async {
+    String jsonStringResult =
+        await _controller.runJavaScriptReturningResult('map.getBounds()')
+            as String;
+    if (Platform.isIOS) {
+      jsonStringResult = NSDictionaryUtil.convert(jsonStringResult);
+    }
+    final Map<String, dynamic> json = jsonDecode(jsonStringResult);
+    final Bounds bounds;
+    if (resultTypeLatLng) {
+      bounds = NLatLngBounds(
+        southWest: NLatLng(json['_sw']['_lat'], json['_sw']['_lng']),
+        northEast: NLatLng(json['_ne']['_lat'], json['_ne']['_lng']),
+      );
+    } else {
+      bounds = NPointBounds(
+        min: NPoint(json['_min']['x'], json['_min']['y']),
+        max: NPoint(json['_max']['x'], json['_max']['y']),
+      );
+    }
+    return bounds;
+  }
+
+  Future<bool> hasLatLng({
+    required NLatLngBounds bounds,
+    required Coord coord,
+  }) async {
+    final bool jsonStringResult =
+        await _controller.runJavaScriptReturningResult(
+              'window.hasLatLng(${bounds.toJson()}, ${coord.toJson()})',
+            )
+            as bool;
+    return jsonStringResult;
+  }
+
+  Future<bool> hasPoint({
+    required NPointBounds bounds,
+    required Coord coord,
+  }) async {
+    final bool jsonStringResult =
+        await _controller.runJavaScriptReturningResult(
+              'window.hasPoint(${bounds.toJson()}, ${coord.toJson()})',
+            )
+            as bool;
+    return jsonStringResult;
   }
 
   Future<void> setCenter({required Coord center}) async {
