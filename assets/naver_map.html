@@ -45,9 +45,8 @@
 
             function addMarker(markerId, markerOptions) {
                 if (map) {
-                    if (markers.has(markerId)) {
-                        markers.get(markerId).setMap(null);
-                        markers.delete(markerId);
+                    if (markers.has(markerId) && markers.get(markerId).getMap()) {
+                        return;
                     }
                     const initMarkerOptions = {
                         map: map,
@@ -87,8 +86,7 @@
             function addMarkerClickEvent(markerId) {
                 if (markers.has(markerId)) {
                     if (markerEventListeners.has(markerId)) {
-                        markerEventListeners.get(markerId).remove();
-                        markerEventListeners.delete(markerId);
+                        return;
                     }
                     const listener = naver.maps.Event.addListener(markers.get(markerId), 'click', function() {
                         window.MarkerEvent.postMessage(JSON.stringify({type: 'markerClick', markerId: markerId}));
