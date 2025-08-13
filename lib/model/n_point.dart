@@ -18,7 +18,7 @@ class NPoint implements Coord {
   }
 
   @override
-  String toString() => ' NPoint($x, $y)';
+  String toString() => ' NPoint(x: $x, y: $y)';
 
   @override
   bool operator ==(Object other) =>

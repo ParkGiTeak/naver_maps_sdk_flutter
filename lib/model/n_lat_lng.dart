@@ -21,7 +21,7 @@ class NLatLng implements Coord {
   }
 
   @override
-  String toString() => '(lat:$lat,lng:$lng)';
+  String toString() => 'NLatLng(lat: $lat, lng: $lng)';
 
   @override
   bool operator ==(Object other) =>
