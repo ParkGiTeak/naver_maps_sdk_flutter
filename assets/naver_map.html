@@ -98,7 +98,7 @@
             function removeMarkerClickEvent(markerId) {
                 if (markers.has(markerId)) {
                     if (markerEventListeners.has(markerId)) {
-                        markerEventListeners.get(markerId).remove();
+                        naver.maps.Event.removeListener(markerEventListeners.get(markerId));
                         markerEventListeners.delete(markerId);
                     }
                 }
