@@ -245,6 +245,15 @@
                     mapEventListeners.delete('center_changed');
                 }
             }
+
+            function disposeMap() {
+                mapEventListeners.forEach((listener) => naver.maps.Event.removeListener(listener));
+                mapEventListeners.clear();
+                markerEventListeners.forEach((listener) => naver.maps.Event.removeListener(listener));
+                markerEventListeners.clear();
+                markers.forEach((marker) => marker.setMap(null));
+                markers.clear();
+            }
         </script>
     </body>
 </html>

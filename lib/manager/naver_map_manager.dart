@@ -70,10 +70,11 @@ class NaverMapManager {
     _mapEventController?.add(MapCenterChanged(latLng, point));
   }
 
-  void dispose() {
+  void dispose() async {
     _mapLoadStatusController?.close();
     _markerEventController?.close();
     _mapEventController?.close();
+    await disposeMap();
   }
 
   Future<Coord> getCenter({required bool resultTypeLatLng}) async {
@@ -259,5 +260,9 @@ class NaverMapManager {
     await _controller.runJavaScript(
       'window.removeMapCenterChangedEventListener()',
     );
+  }
+
+  Future<void> disposeMap() async {
+    await _controller.runJavaScript('window.disposeMap()');
   }
 }
