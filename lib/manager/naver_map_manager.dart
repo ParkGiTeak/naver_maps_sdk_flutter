@@ -156,7 +156,7 @@ class NaverMapManager {
   }
 
   Future<void> addMarker({
-    required int markerId,
+    required String markerId,
     required MarkerOptions markerOptions,
   }) async {
     await _controller.runJavaScript(
@@ -165,7 +165,7 @@ class NaverMapManager {
   }
 
   Future<void> updateMarker({
-    required int markerId,
+    required String markerId,
     required MarkerOptions markerOptions,
   }) async {
     await _controller.runJavaScript(
@@ -173,7 +173,7 @@ class NaverMapManager {
     );
   }
 
-  Future<void> removeMarker({required int markerId}) async {
+  Future<void> removeMarker({required String markerId}) async {
     await _controller.runJavaScript('window.removeMarker($markerId)');
   }
 
@@ -192,11 +192,11 @@ class NaverMapManager {
     return markerIds.cast<int>();
   }
 
-  Future<void> addMarkerClickEvent({required int markerId}) async {
+  Future<void> addMarkerClickEvent({required String markerId}) async {
     await _controller.runJavaScript('window.addMarkerClickEvent($markerId)');
   }
 
-  Future<void> removeMarkerClickEvent({required int markerId}) async {
+  Future<void> removeMarkerClickEvent({required String markerId}) async {
     await _controller.runJavaScript('window.removeMarkerClickEvent($markerId)');
   }
 
