@@ -1,4 +1,4 @@
-part of '../naver_maps_sdk_flutter.dart';
+part of 'naver_maps_sdk_flutter_app.dart';
 
 class NaverMapWidget extends StatelessWidget {
   final MapOptions? _mapOptions;
