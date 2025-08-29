@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:naver_maps_sdk_flutter/model/coord.dart';
 
 class NLatLng implements Coord {
@@ -17,7 +18,10 @@ class NLatLng implements Coord {
 
   @override
   Map<String, dynamic> toJson() {
-    return {'lat': jsonEncode(lat), 'lng': jsonEncode(lng)};
+    return {
+      'lat': kIsWeb ? lat : jsonEncode(lat),
+      'lng': kIsWeb ? lng : jsonEncode(lng),
+    };
   }
 
   @override

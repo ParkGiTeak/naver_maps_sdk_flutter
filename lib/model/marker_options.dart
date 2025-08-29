@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:naver_maps_sdk_flutter/enum/n_animation.dart';
 import 'package:naver_maps_sdk_flutter/model/coord.dart';
 import 'package:naver_maps_sdk_flutter/model/n_icon.dart';
@@ -41,14 +42,18 @@ class MarkerOptions {
       'position': position.toJson(),
       if (icon != null) 'icon': icon!.toJson(),
       if (shape != null) 'shape': shape!.toJson(),
-      if (title != null) 'title': jsonEncode(title),
-      if (cursor != null) 'cursor': jsonEncode(cursor),
-      if (clickable != null) 'clickable': jsonEncode(clickable),
-      if (draggable != null) 'draggable': jsonEncode(draggable),
-      if (visible != null) 'visible': jsonEncode(visible),
-      if (zIndex != null) 'zIndex': jsonEncode(zIndex),
+      if (title != null) 'title': kIsWeb ? title : jsonEncode(title),
+      if (cursor != null) 'cursor': kIsWeb ? cursor : jsonEncode(cursor),
+      if (clickable != null)
+        'clickable': kIsWeb ? clickable : jsonEncode(clickable),
+      if (draggable != null)
+        'draggable': kIsWeb ? draggable : jsonEncode(draggable),
+      if (visible != null) 'visible': kIsWeb ? visible : jsonEncode(visible),
+      if (zIndex != null) 'zIndex': kIsWeb ? zIndex : jsonEncode(zIndex),
       if (collisionBehavior != null)
-        'collisionBehavior': jsonEncode(collisionBehavior),
+        'collisionBehavior': kIsWeb
+            ? collisionBehavior
+            : jsonEncode(collisionBehavior),
       if (collisionBoxSize != null)
         'collisionBoxSize': collisionBoxSize!.toJson(),
     };

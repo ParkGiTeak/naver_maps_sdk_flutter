@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:naver_maps_sdk_flutter/enum/naver_map_map_type_id.dart';
 import 'package:naver_maps_sdk_flutter/enum/naver_map_position_type.dart';
 import 'package:naver_maps_sdk_flutter/model/bounds.dart';
@@ -232,52 +233,88 @@ class MapOptions {
 
   Map<String, dynamic> toJson() {
     return {
-      if (background != null) 'background': jsonEncode(background),
-      if (baseTileOpacity != null) 'baseTileOpacity': jsonEncode(baseTileOpacity),
+      if (background != null)
+        'background': kIsWeb ? background : jsonEncode(background),
+      if (baseTileOpacity != null)
+        'baseTileOpacity': kIsWeb
+            ? baseTileOpacity
+            : jsonEncode(baseTileOpacity),
       if (bounds != null) 'bounds': bounds!.toJson(),
       if (center != null) 'center': center!.toJson(),
       if (disableDoubleClickZoom != null)
-        'disableDoubleClickZoom': jsonEncode(disableDoubleClickZoom),
+        'disableDoubleClickZoom': kIsWeb
+            ? disableDoubleClickZoom
+            : jsonEncode(disableDoubleClickZoom),
       if (disableDoubleTapZoom != null)
-        'disableDoubleTapZoom': jsonEncode(disableDoubleTapZoom),
-      if (disableKineticPan != null) 'disableKineticPan': jsonEncode(disableKineticPan),
+        'disableDoubleTapZoom': kIsWeb
+            ? disableDoubleTapZoom
+            : jsonEncode(disableDoubleTapZoom),
+      if (disableKineticPan != null)
+        'disableKineticPan': kIsWeb
+            ? disableKineticPan
+            : jsonEncode(disableKineticPan),
       if (disableTwoFingerTapZoom != null)
-        'disableTwoFingerTapZoom': jsonEncode(disableTwoFingerTapZoom),
-      if (draggable != null) 'draggable': jsonEncode(draggable),
-      if (keyboardShortcuts != null) 'keyboardShortcuts': jsonEncode(keyboardShortcuts),
-      if (logoControl != null) 'logoControl': jsonEncode(logoControl),
+        'disableTwoFingerTapZoom': kIsWeb
+            ? disableTwoFingerTapZoom
+            : jsonEncode(disableTwoFingerTapZoom),
+      if (draggable != null)
+        'draggable': kIsWeb ? draggable : jsonEncode(draggable),
+      if (keyboardShortcuts != null)
+        'keyboardShortcuts': kIsWeb
+            ? keyboardShortcuts
+            : jsonEncode(keyboardShortcuts),
+      if (logoControl != null)
+        'logoControl': kIsWeb ? logoControl : jsonEncode(logoControl),
       if (logoControlOptions != null)
         'logoControlOptions': logoControlOptions!.toJson(),
-      if (mapDataControl != null) 'mapDataControl': jsonEncode(mapDataControl),
+      if (mapDataControl != null)
+        'mapDataControl': kIsWeb ? mapDataControl : jsonEncode(mapDataControl),
       if (mapDataControlOptions != null)
         'mapDataControlOptions': mapDataControlOptions!.toJson(),
-      if (mapTypeControl != null) 'mapTypeControl': jsonEncode(mapTypeControl),
+      if (mapTypeControl != null)
+        'mapTypeControl': kIsWeb ? mapTypeControl : jsonEncode(mapTypeControl),
       if (mapTypeControlOptions != null)
         'mapTypeControlOptions': mapTypeControlOptions!.toJson(),
-      if (mapTypeId != null) 'mapTypeId': jsonEncode(mapTypeId!.value),
+      if (mapTypeId != null)
+        'mapTypeId': kIsWeb ? mapTypeId!.value : jsonEncode(mapTypeId!.value),
       if (maxBounds != null) 'maxBounds': maxBounds!.toJson(),
-      if (maxZoom != null) 'maxZoom': jsonEncode(maxZoom),
-      if (minZoom != null) 'minZoom': jsonEncode(minZoom),
+      if (maxZoom != null) 'maxZoom': kIsWeb ? maxZoom : jsonEncode(maxZoom),
+      if (minZoom != null) 'minZoom': kIsWeb ? minZoom : jsonEncode(minZoom),
       if (padding != null) 'padding': padding!.toJson(),
-      if (pinchZoom != null) 'pinchZoom': jsonEncode(pinchZoom),
-      if (resizeOrigin != null) 'resizeOrigin': jsonEncode(resizeOrigin!.value),
-      if (scaleControl != null) 'scaleControl': jsonEncode(scaleControl),
+      if (pinchZoom != null)
+        'pinchZoom': kIsWeb ? pinchZoom : jsonEncode(pinchZoom),
+      if (resizeOrigin != null)
+        'resizeOrigin': kIsWeb
+            ? resizeOrigin!.value
+            : jsonEncode(resizeOrigin!.value),
+      if (scaleControl != null)
+        'scaleControl': kIsWeb ? scaleControl : jsonEncode(scaleControl),
       if (scaleControlOptions != null)
         'scaleControlOptions': scaleControlOptions!.toJson(),
-      if (scrollWheel != null) 'scrollWheel': jsonEncode(scrollWheel),
+      if (scrollWheel != null)
+        'scrollWheel': kIsWeb ? scrollWheel : jsonEncode(scrollWheel),
       if (size != null) 'size': size!.toJson(),
-      if (overlayZoomEffect != null) 'overlayZoomEffect': jsonEncode(overlayZoomEffect),
-      if (tileSpare != null) 'tileSpare': jsonEncode(tileSpare),
-      if (tileTransition != null) 'tileTransition': jsonEncode(tileTransition),
-      if (tileDuration != null) 'tileDuration': jsonEncode(tileDuration),
-      if (zoom != null) 'zoom': jsonEncode(zoom),
-      if (zoomControl != null) 'zoomControl': jsonEncode(zoomControl),
+      if (overlayZoomEffect != null)
+        'overlayZoomEffect': kIsWeb
+            ? overlayZoomEffect
+            : jsonEncode(overlayZoomEffect),
+      if (tileSpare != null)
+        'tileSpare': kIsWeb ? tileSpare : jsonEncode(tileSpare),
+      if (tileTransition != null)
+        'tileTransition': kIsWeb ? tileTransition : jsonEncode(tileTransition),
+      if (tileDuration != null)
+        'tileDuration': kIsWeb ? tileDuration : jsonEncode(tileDuration),
+      if (zoom != null) 'zoom': kIsWeb ? zoom : jsonEncode(zoom),
+      if (zoomControl != null)
+        'zoomControl': kIsWeb ? zoomControl : jsonEncode(zoomControl),
       if (zoomControlOptions != null)
         'zoomControlOptions': zoomControlOptions!.toJson(),
       if (zoomOrigin != null) 'zoomOrigin': zoomOrigin!.toJson(),
-      if (blankTileImage != null) 'blankTileImage': jsonEncode(blankTileImage),
-      if (gl != null) 'gl': jsonEncode(gl),
-      if (customStyleId != null) 'customStyleId': jsonEncode(customStyleId),
+      if (blankTileImage != null)
+        'blankTileImage': kIsWeb ? blankTileImage : jsonEncode(blankTileImage),
+      if (gl != null) 'gl': kIsWeb ? gl : jsonEncode(gl),
+      if (customStyleId != null)
+        'customStyleId': kIsWeb ? customStyleId : jsonEncode(customStyleId),
     };
   }
 }

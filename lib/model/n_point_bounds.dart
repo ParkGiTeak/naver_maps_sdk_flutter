@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:naver_maps_sdk_flutter/model/bounds.dart';
 import 'package:naver_maps_sdk_flutter/model/n_point.dart';
 
@@ -18,7 +19,10 @@ class NPointBounds implements Bounds {
 
   @override
   Map<String, dynamic> toJson() {
-    return {'min': jsonEncode(min.toJson()), 'max': jsonEncode(max.toJson())};
+    return {
+      'min': kIsWeb ? min.toJson() : jsonEncode(min.toJson()),
+      'max': kIsWeb ? max.toJson() : jsonEncode(max.toJson()),
+    };
   }
 
   @override

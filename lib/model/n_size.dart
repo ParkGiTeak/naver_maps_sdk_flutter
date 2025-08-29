@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+
 class NSize {
   final double width;
   final double height;
@@ -14,7 +16,10 @@ class NSize {
   }
 
   Map<String, dynamic> toJson() {
-    return {'width': jsonEncode(width), 'height': jsonEncode(height)};
+    return {
+      'width': kIsWeb ? width : jsonEncode(width),
+      'height': kIsWeb ? height : jsonEncode(height),
+    };
   }
 
   @override

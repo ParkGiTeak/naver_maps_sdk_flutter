@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:naver_maps_sdk_flutter/model/n_icon.dart';
 import 'package:naver_maps_sdk_flutter/model/n_point.dart';
 import 'package:naver_maps_sdk_flutter/model/n_size.dart';
@@ -22,7 +23,7 @@ class NImageIcon implements NIcon {
   @override
   Map<String, dynamic> toJson() {
     return {
-      'url': jsonEncode(url),
+      'url': kIsWeb ? url : jsonEncode(url),
       if (size != null) 'size': size!.toJson(),
       if (scaledSize != null) 'scaledSize': scaledSize!.toJson(),
       if (origin != null) 'origin': origin!.toJson(),

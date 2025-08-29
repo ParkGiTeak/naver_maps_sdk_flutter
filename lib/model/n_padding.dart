@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+
 class NPadding {
   final double top;
   final double right;
@@ -30,10 +32,10 @@ class NPadding {
 
   Map<String, dynamic> toJson() {
     return {
-      'top': jsonEncode(top),
-      'right': jsonEncode(right),
-      'bottom': jsonEncode(bottom),
-      'left': jsonEncode(left),
+      'top': kIsWeb ? top : jsonEncode(top),
+      'right': kIsWeb ? right : jsonEncode(right),
+      'bottom': kIsWeb ? bottom : jsonEncode(bottom),
+      'left': kIsWeb ? left : jsonEncode(left),
     };
   }
 

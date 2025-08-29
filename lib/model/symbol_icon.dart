@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:naver_maps_sdk_flutter/enum/n_stroke_style.dart';
 import 'package:naver_maps_sdk_flutter/enum/symbol_style.dart';
 import 'package:naver_maps_sdk_flutter/model/n_icon.dart';
@@ -44,13 +45,18 @@ class SymbolIcon implements NIcon {
     return {
       'path': path.map((p) => p.toJson()).toList(),
       if (style != null) 'style': style!.value,
-      if (radius != null) 'radius': jsonEncode(radius),
-      if (fillColor != null) 'fillColor': jsonEncode(fillColor),
-      if (fillOpacity != null) 'fillOpacity': jsonEncode(fillOpacity),
-      if (strokeColor != null) 'strokeColor': jsonEncode(strokeColor),
+      if (radius != null) 'radius': kIsWeb ? radius : jsonEncode(radius),
+      if (fillColor != null)
+        'fillColor': kIsWeb ? fillColor : jsonEncode(fillColor),
+      if (fillOpacity != null)
+        'fillOpacity': kIsWeb ? fillOpacity : jsonEncode(fillOpacity),
+      if (strokeColor != null)
+        'strokeColor': kIsWeb ? strokeColor : jsonEncode(strokeColor),
       if (strokeStyle != null) 'strokeStyle': strokeStyle!.value,
-      if (strokeWeight != null) 'strokeWeight': jsonEncode(strokeWeight),
-      if (strokeOpacity != null) 'strokeOpacity': jsonEncode(strokeOpacity),
+      if (strokeWeight != null)
+        'strokeWeight': kIsWeb ? strokeWeight : jsonEncode(strokeWeight),
+      if (strokeOpacity != null)
+        'strokeOpacity': kIsWeb ? strokeOpacity : jsonEncode(strokeOpacity),
       if (anchor != null) 'anchor': anchor!.toJson(),
     };
   }
