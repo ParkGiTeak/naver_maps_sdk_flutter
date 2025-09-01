@@ -27,11 +27,11 @@ abstract interface class NaverMapManagerInterface {
 
   void dispose();
 
-  Future<Coord> getCenter({required bool resultTypeLatLng});
+  Future<Coord> getCenter({required bool shouldReturnLatLng});
 
   Future<int> getZoom();
 
-  Future<Bounds> getBounds({required bool resultTypeLatLng});
+  Future<Bounds> getBounds({required bool shouldReturnLatLng});
 
   Future<bool> hasLatLng({required NLatLngBounds bounds, required Coord coord});
 
