@@ -3,9 +3,10 @@
     <head>
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
         <script id="naverMapScript" type="text/javascript"></script>
-
+        <!-- WebView Flutter App 용 -->
         <style>
             html, body {
                 margin: 0;
@@ -13,93 +14,155 @@
                 height: 100%;
                 overflow: hidden;
             }
-            #map {
-                width: 100vw;
-                height: 100vh;
-            }
         </style>
     </head>
     <body>
-        <div id="map"></div>
+        <div id="map" style="width: 100%; height: 100%;"></div>
 
-        <script type="text/javascript">
-            let map;
-            let markers = new Map();
-            let markerEventListeners = new Map();
-            let mapEventListeners = new Map();
+        <script id="naverMapFunctions" type="text/javascript">
+            const mapInstances = {};
 
-            function initMap(mapOptions = null) {
-                console.log("Naver Map Init Call", mapOptions);
+            function getMapInstance(mapId) {
+                return mapInstances[mapId];
+            }
+
+            function initMap(mapDiv, mapOptions, mapId) {
+                console.log(`Naver Map Init Call for mapDiv: ${mapDiv}, mapId: ${mapId}`);
+
+                mapInstances[mapId] = {
+                    map: null,
+                    markers: new Map(),
+                    markerEventListeners: new Map(),
+                    mapEventListeners: new Map(),
+                };
+
+                const mapInstance = getMapInstance(mapId);
+                const channel = window[`MapLoadStatus_${mapId}`];
 
                 window.navermap_authFailure = function () {
-                    window.FlutterMethodChannel.postMessage(JSON.stringify({type: 'mapLoadFail'}));
+                    if (channel) {
+                        channel.postMessage(JSON.stringify({type: 'mapLoadFail'}));
+                    }
                     console.log("Naver Map Init ERROR!");
                 }
 
-                map = new naver.maps.Map('map', mapOptions);
+                mapInstance.map = new naver.maps.Map(mapDiv, mapOptions || {});
 
-                if (window.FlutterMethodChannel) {
-                    window.FlutterMethodChannel.postMessage(JSON.stringify({type: 'mapLoaded'}));
+                if (channel) {
+                    channel.postMessage(JSON.stringify({type: 'mapLoaded'}));
                 }
             }
 
-            function addMarker(markerId, markerOptions) {
-                if (map) {
-                    if (markers.has(markerId) && markers.get(markerId).getMap()) {
+            function getCenter(mapId) {
+                const mapInstance = getMapInstance(mapId);
+                if (mapInstance && mapInstance.map) {
+                    return mapInstance.map.getCenter();
+                }
+                return null;
+            }
+
+            function setCenter(mapId, center) {
+                const mapInstance = getMapInstance(mapId);
+                if (mapInstance && mapInstance.map) {
+                    mapInstance.map.setCenter(center);
+                }
+            }
+
+            function getZoom(mapId) {
+                const mapInstance = getMapInstance(mapId);
+                if (mapInstance && mapInstance.map) {
+                    return mapInstance.map.getZoom();
+                }
+                return null;
+            }
+
+            function setZoom(mapId, zoom) {
+                const mapInstance = getMapInstance(mapId);
+                if (mapInstance && mapInstance.map) {
+                    mapInstance.map.setZoom(zoom);
+                }
+            }
+
+            function getBounds(mapId) {
+                const mapInstance = getMapInstance(mapId);
+                if (mapInstance && mapInstance.map) {
+                    return mapInstance.map.getBounds();
+                }
+                return null;
+            }
+
+            function addMarker(mapId, markerId, markerOptions) {
+                const mapInstance = getMapInstance(mapId);
+                if (mapInstance && mapInstance.map) {
+                    if (mapInstance.markers.has(markerId) && mapInstance.markers.get(markerId).getMap()) {
                         return;
                     }
                     const initMarkerOptions = {
-                        map: map,
+                        map: mapInstance.map,
                         ...markerOptions
                     };
                     let marker = new naver.maps.Marker(initMarkerOptions);
-                    markers.set(markerId, marker);
+                    mapInstance.markers.set(markerId, marker);
                 }
             }
 
-            function updateMarker(markerId, markerOptions) {
-                if (markers.has(markerId)) {
+            function updateMarker(mapId, markerId, markerOptions) {
+                const mapInstance = getMapInstance(mapId);
+                if (mapInstance && mapInstance.markers.has(markerId)) {
                     const initMarkerOptions = {
-                        map: map,
+                        map: mapInstance.map,
                         ...markerOptions
                     };
-                    markers.get(markerId).setOptions(initMarkerOptions);
+                    mapInstance.markers.get(markerId).setOptions(initMarkerOptions);
                 }
             }
 
-            function removeMarker(markerId) {
-                if (markers.has(markerId)) {
-                    markers.get(markerId).setMap(null);
-                    markers.delete(markerId);
+            function removeMarker(mapId, markerId) {
+                const mapInstance = getMapInstance(mapId);
+                if (mapInstance && mapInstance.markers.has(markerId)) {
+                    mapInstance.markers.get(markerId).setMap(null);
+                    mapInstance.markers.delete(markerId);
                 }
             }
 
-            function removeMarkerAll() {
-                markers.forEach((marker) => marker.setMap(null));
-                markers.clear();
+            function removeMarkerAll(mapId) {
+                const mapInstance = getMapInstance(mapId);
+                if (mapInstance) {
+                    mapInstance.markers.forEach((marker) => marker.setMap(null));
+                    mapInstance.markers.clear();
+                }
             }
 
-            function getMarkerIds() {
-                return Array.from(markers.keys());
+            function getMarkerIds(mapId) {
+                const mapInstance = getMapInstance(mapId);
+                if (mapInstance) {
+                    return Array.from(mapInstance.markers.keys());
+                }
+                return [];
             }
 
-            function addMarkerClickEvent(markerId) {
-                if (markers.has(markerId)) {
-                    if (markerEventListeners.has(markerId)) {
+            function addMarkerClickEvent(mapId, markerId) {
+                const mapInstance = getMapInstance(mapId);
+                const channel = window[`MarkerEvent_${mapId}`];
+                if (mapInstance && mapInstance.markers.has(markerId)) {
+                    if (mapInstance.markerEventListeners.has(markerId)) {
                         return;
                     }
-                    const listener = naver.maps.Event.addListener(markers.get(markerId), 'click', function() {
-                        window.MarkerEvent.postMessage(JSON.stringify({type: 'markerClick', markerId: markerId}));
+                    const listener = naver.maps.Event.addListener(mapInstance.markers.get(markerId), 'click', function () {
+                        if (channel) {
+                            channel.postMessage(JSON.stringify({type: 'markerClick', markerId: markerId}));
+                        }
                     });
-                    markerEventListeners.set(markerId, listener);
+                    mapInstance.markerEventListeners.set(markerId, listener);
                 }
             }
 
-            function removeMarkerClickEvent(markerId) {
-                if (markers.has(markerId)) {
-                    if (markerEventListeners.has(markerId)) {
-                        naver.maps.Event.removeListener(markerEventListeners.get(markerId));
-                        markerEventListeners.delete(markerId);
+            function removeMarkerClickEvent(mapId, markerId) {
+                const mapInstance = getMapInstance(mapId);
+                if (mapInstance && mapInstance.markers.has(markerId)) {
+                    if (mapInstance.markerEventListeners.has(markerId)) {
+                        naver.maps.Event.removeListener(mapInstance.markerEventListeners.get(markerId));
+                        mapInstance.markerEventListeners.delete(markerId);
                     }
                 }
             }
@@ -120,139 +183,206 @@
                 return bounds.hasPoint(point);
             }
 
-            function addMapClickEventListener() {
-                if (mapEventListeners.has('click')) {
-                    return;
-                }
-                const listener = naver.maps.Event.addListener(map, 'click', function(pointerEvent) {
-                    window.MapEvent.postMessage(JSON.stringify({type: 'click', coord: pointerEvent.coord}));
-                });
-                mapEventListeners.set('click', listener);
-            }
-
-            function removeMapClickEventListener() {
-                if (mapEventListeners.has('click')) {
-                    const listener = mapEventListeners.get('click');
-                    naver.maps.Event.removeListener(listener);
-                    mapEventListeners.delete('click');
+            function addMapClickEventListener(mapId) {
+                const mapInstance = getMapInstance(mapId);
+                const channel = window[`MapEvent_${mapId}`];
+                if (mapInstance && mapInstance.map) {
+                    if (mapInstance.mapEventListeners.has('click')) {
+                        return;
+                    }
+                    const listener = naver.maps.Event.addListener(mapInstance.map, 'click', function (pointerEvent) {
+                        if (channel) {
+                            channel.postMessage(JSON.stringify({type: 'click', coord: pointerEvent.coord}));
+                        }
+                    });
+                    mapInstance.mapEventListeners.set('click', listener);
                 }
             }
 
-            function addMapLongTapEventListener() {
-                if (mapEventListeners.has('longtap')) {
-                    return;
-                }
-                const listener = naver.maps.Event.addListener(map, 'longtap', function(pointerEvent) {
-                    window.MapEvent.postMessage(JSON.stringify({type: 'longtap', coord: pointerEvent.coord}));
-                });
-                mapEventListeners.set('longtap', listener);
-            }
-
-            function removeMapLongTapEventListener() {
-                if (mapEventListeners.has('longtap')) {
-                    const listener = mapEventListeners.get('longtap');
-                    naver.maps.Event.removeListener(listener);
-                    mapEventListeners.delete('longtap');
+            function removeMapClickEventListener(mapId) {
+                const mapInstance = getMapInstance(mapId);
+                if (mapInstance && mapInstance.map) {
+                    if (mapInstance.mapEventListeners.has('click')) {
+                        const listener = mapInstance.mapEventListeners.get('click');
+                        naver.maps.Event.removeListener(listener);
+                        mapInstance.mapEventListeners.delete('click');
+                    }
                 }
             }
 
-            function addMapIdleEventListener() {
-                if (mapEventListeners.has('idle')) {
-                    return;
-                }
-                const listener = naver.maps.Event.addListener(map, 'idle', function() {
-                    window.MapEvent.postMessage(JSON.stringify({type: 'idle'}));
-                });
-                mapEventListeners.set('idle', listener);
-            }
-
-            function removeMapIdleEventListener() {
-                if (mapEventListeners.has('idle')) {
-                    const listener = mapEventListeners.get('idle');
-                    naver.maps.Event.removeListener(listener);
-                    mapEventListeners.delete('idle');
+            function addMapLongTapEventListener(mapId) {
+                const mapInstance = getMapInstance(mapId);
+                const channel = window[`MapEvent_${mapId}`];
+                if (mapInstance && mapInstance.map) {
+                    if (mapInstance.mapEventListeners.has('longtap')) {
+                        return;
+                    }
+                    const listener = naver.maps.Event.addListener(mapInstance.map, 'longtap', function(pointerEvent) {
+                        if (channel) {
+                            channel.postMessage(JSON.stringify({type: 'longtap', coord: pointerEvent.coord}));
+                        }
+                    });
+                    mapInstance.mapEventListeners.set('longtap', listener);
                 }
             }
 
-            function addMapZoomChangedEventListener() {
-                if (mapEventListeners.has('zoom_changed')) {
-                    return;
-                }
-                const listener = naver.maps.Event.addListener(map, 'zoom_changed', function(zoom) {
-                    window.MapEvent.postMessage(JSON.stringify({type: 'zoom_changed', zoom: zoom}));
-                });
-                mapEventListeners.set('zoom_changed', listener);
-            }
-
-            function removeMapZoomChangedEventListener() {
-                if (mapEventListeners.has('zoom_changed')) {
-                    const listener = mapEventListeners.get('zoom_changed');
-                    naver.maps.Event.removeListener(listener);
-                    mapEventListeners.delete('zoom_changed');
+            function removeMapLongTapEventListener(mapId) {
+                const mapInstance = getMapInstance(mapId);
+                if (mapInstance && mapInstance.map) {
+                    if (mapInstance.mapEventListeners.has('longtap')) {
+                        const listener = mapInstance.mapEventListeners.get('longtap');
+                        naver.maps.Event.removeListener(listener);
+                        mapInstance.mapEventListeners.delete('longtap');
+                    }
                 }
             }
 
-            function addMapZoomEndEventListener() {
-                if (mapEventListeners.has('zoomend')) {
-                    return;
-                }
-                const listener = naver.maps.Event.addListener(map, 'zoomend', function() {
-                    window.MapEvent.postMessage(JSON.stringify({type: 'zoomend'}));
-                });
-                mapEventListeners.set('zoomend', listener);
-            }
-
-            function removeMapZoomEndEventListener() {
-                if (mapEventListeners.has('zoomend')) {
-                    const listener = mapEventListeners.get('zoomend');
-                    naver.maps.Event.removeListener(listener);
-                    mapEventListeners.delete('zoomend');
+            function addMapIdleEventListener(mapId) {
+                const mapInstance = getMapInstance(mapId);
+                const channel = window[`MapEvent_${mapId}`];
+                if (mapInstance && mapInstance.map) {
+                    if (mapInstance.mapEventListeners.has('idle')) {
+                        return;
+                    }
+                    const listener = naver.maps.Event.addListener(mapInstance.map, 'idle', function() {
+                        if (channel) {
+                            channel.postMessage(JSON.stringify({type: 'idle'}));
+                        }
+                    });
+                    mapInstance.mapEventListeners.set('idle', listener);
                 }
             }
 
-            function addMapZoomStartEventListener() {
-                if (mapEventListeners.has('zoomstart')) {
-                    return;
-                }
-                const listener = naver.maps.Event.addListener(map, 'zoomstart', function() {
-                    window.MapEvent.postMessage(JSON.stringify({type: 'zoomstart'}));
-                });
-                mapEventListeners.set('zoomstart', listener);
-            }
-
-            function removeMapZoomStartEventListener() {
-                if (mapEventListeners.has('zoomstart')) {
-                    const listener = mapEventListeners.get('zoomstart');
-                    naver.maps.Event.removeListener(listener);
-                    mapEventListeners.delete('zoomstart');
+            function removeMapIdleEventListener(mapId) {
+                const mapInstance = getMapInstance(mapId);
+                if (mapInstance && mapInstance.map) {
+                    if (mapInstance.mapEventListeners.has('idle')) {
+                        const listener = mapInstance.mapEventListeners.get('idle');
+                        naver.maps.Event.removeListener(listener);
+                        mapInstance.mapEventListeners.delete('idle');
+                    }
                 }
             }
 
-            function addMapCenterChangedEventListener() {
-                if (mapEventListeners.has('center_changed')) {
-                    return;
-                }
-                const listener = naver.maps.Event.addListener(map, 'center_changed', function(center) {
-                    window.MapEvent.postMessage(JSON.stringify({type: 'center_changed', center: center}));
-                });
-                mapEventListeners.set('center_changed', listener);
-            }
-
-            function removeMapCenterChangedEventListener() {
-                if (mapEventListeners.has('center_changed')) {
-                    const listener = mapEventListeners.get('center_changed');
-                    naver.maps.Event.removeListener(listener);
-                    mapEventListeners.delete('center_changed');
+            function addMapZoomChangedEventListener(mapId) {
+                const mapInstance = getMapInstance(mapId);
+                const channel = window[`MapEvent_${mapId}`];
+                if (mapInstance && mapInstance.map) {
+                    if (mapInstance.mapEventListeners.has('zoom_changed')) {
+                        return;
+                    }
+                    const listener = naver.maps.Event.addListener(mapInstance.map, 'zoom_changed', function(zoom) {
+                        if (channel) {
+                            channel.postMessage(JSON.stringify({type: 'zoom_changed', zoom: zoom}));
+                        }
+                    });
+                    mapInstance.mapEventListeners.set('zoom_changed', listener);
                 }
             }
 
-            function disposeMap() {
-                mapEventListeners.forEach((listener) => naver.maps.Event.removeListener(listener));
-                mapEventListeners.clear();
-                markerEventListeners.forEach((listener) => naver.maps.Event.removeListener(listener));
-                markerEventListeners.clear();
-                markers.forEach((marker) => marker.setMap(null));
-                markers.clear();
+            function removeMapZoomChangedEventListener(mapId) {
+                const mapInstance = getMapInstance(mapId);
+                if (mapInstance && mapInstance.map) {
+                    if (mapInstance.mapEventListeners.has('zoom_changed')) {
+                        const listener = mapInstance.mapEventListeners.get('zoom_changed');
+                        naver.maps.Event.removeListener(listener);
+                        mapInstance.mapEventListeners.delete('zoom_changed');
+                    }
+                }
+            }
+
+            function addMapZoomEndEventListener(mapId) {
+                const mapInstance = getMapInstance(mapId);
+                const channel = window[`MapEvent_${mapId}`];
+                if (mapInstance && mapInstance.map) {
+                    if (mapInstance.mapEventListeners.has('zoomend')) {
+                        return;
+                    }
+                    const listener = naver.maps.Event.addListener(mapInstance.map, 'zoomend', function() {
+                        if (channel) {
+                            channel.postMessage(JSON.stringify({type: 'zoomend'}));
+                        }
+                    });
+                    mapInstance.mapEventListeners.set('zoomend', listener);
+                }
+            }
+
+            function removeMapZoomEndEventListener(mapId) {
+                const mapInstance = getMapInstance(mapId);
+                if (mapInstance && mapInstance.map) {
+                    if (mapInstance.mapEventListeners.has('zoomend')) {
+                        const listener = mapInstance.mapEventListeners.get('zoomend');
+                        naver.maps.Event.removeListener(listener);
+                        mapInstance.mapEventListeners.delete('zoomend');
+                    }
+                }
+            }
+
+            function addMapZoomStartEventListener(mapId) {
+                const mapInstance = getMapInstance(mapId);
+                const channel = window[`MapEvent_${mapId}`];
+                if (mapInstance && mapInstance.map) {
+                    if (mapInstance.mapEventListeners.has('zoomstart')) {
+                        return;
+                    }
+                    const listener = naver.maps.Event.addListener(mapInstance.map, 'zoomstart', function() {
+                        if (channel) {
+                            channel.postMessage(JSON.stringify({type: 'zoomstart'}));
+                        }
+                    });
+                    mapInstance.mapEventListeners.set('zoomstart', listener);
+                }
+            }
+
+            function removeMapZoomStartEventListener(mapId) {
+                const mapInstance = getMapInstance(mapId);
+                if (mapInstance && mapInstance.map) {
+                    if (mapInstance.mapEventListeners.has('zoomstart')) {
+                        const listener = mapInstance.mapEventListeners.get('zoomstart');
+                        naver.maps.Event.removeListener(listener);
+                        mapInstance.mapEventListeners.delete('zoomstart');
+                    }
+                }
+            }
+
+            function addMapCenterChangedEventListener(mapId) {
+                const mapInstance = getMapInstance(mapId);
+                const channel = window[`MapEvent_${mapId}`];
+                if (mapInstance && mapInstance.map) {
+                    if (mapInstance.mapEventListeners.has('center_changed')) {
+                        return;
+                    }
+                    const listener = naver.maps.Event.addListener(mapInstance.map, 'center_changed', function(center) {
+                        if (channel) {
+                            channel.postMessage(JSON.stringify({type: 'center_changed', center: center}));
+                        }
+                    });
+                    mapInstance.mapEventListeners.set('center_changed', listener);
+                }
+            }
+
+            function removeMapCenterChangedEventListener(mapId) {
+                const mapInstance = getMapInstance(mapId);
+                if (mapInstance && mapInstance.map) {
+                    if (mapInstance.mapEventListeners.has('center_changed')) {
+                        const listener = mapInstance.mapEventListeners.get('center_changed');
+                        naver.maps.Event.removeListener(listener);
+                        mapInstance.mapEventListeners.delete('center_changed');
+                    }
+                }
+            }
+
+            function disposeMap(mapId) {
+                const mapInstance = getMapInstance(mapId);
+                if (mapInstance) {
+                    mapInstance.mapEventListeners.forEach((listener) => naver.maps.Event.removeListener(listener));
+                    mapInstance.mapEventListeners.clear();
+                    mapInstance.markerEventListeners.forEach((listener) => naver.maps.Event.removeListener(listener));
+                    mapInstance.markerEventListeners.clear();
+                    mapInstance.markers.forEach((marker) => marker.setMap(null));
+                    mapInstance.markers.clear();
+                    delete mapInstances[mapId];
+                }
             }
         </script>
     </body>
