@@ -37,7 +37,11 @@
                 };
 
                 const mapInstance = getMapInstance(mapId);
-                const channel = window[`MapLoadStatus_${mapId}`];
+                const channelName = `MapLoadStatus_${mapId}`;
+                const channel = window[channelName] ||
+                    (window.webkit &&
+                     window.webkit.messageHandlers &&
+                     window.webkit.messageHandlers[channelName]);
 
                 window.navermap_authFailure = function () {
                     if (channel) {
@@ -143,7 +147,11 @@
 
             function addMarkerClickEvent(mapId, markerId) {
                 const mapInstance = getMapInstance(mapId);
-                const channel = window[`MarkerEvent_${mapId}`];
+                const channelName = `MarkerEvent_${mapId}`;
+                const channel = window[channelName] ||
+                    (window.webkit &&
+                     window.webkit.messageHandlers &&
+                     window.webkit.messageHandlers[channelName]);
                 if (mapInstance && mapInstance.markers.has(markerId)) {
                     if (mapInstance.markerEventListeners.has(markerId)) {
                         return;
@@ -185,7 +193,11 @@
 
             function addMapClickEventListener(mapId) {
                 const mapInstance = getMapInstance(mapId);
-                const channel = window[`MapEvent_${mapId}`];
+                const channelName = `MapEvent_${mapId}`;
+                const channel = window[channelName] ||
+                    (window.webkit &&
+                     window.webkit.messageHandlers &&
+                     window.webkit.messageHandlers[channelName]);
                 if (mapInstance && mapInstance.map) {
                     if (mapInstance.mapEventListeners.has('click')) {
                         return;
@@ -212,7 +224,11 @@
 
             function addMapLongTapEventListener(mapId) {
                 const mapInstance = getMapInstance(mapId);
-                const channel = window[`MapEvent_${mapId}`];
+                const channelName = `MapEvent_${mapId}`;
+                const channel = window[channelName] ||
+                    (window.webkit &&
+                     window.webkit.messageHandlers &&
+                     window.webkit.messageHandlers[channelName]);
                 if (mapInstance && mapInstance.map) {
                     if (mapInstance.mapEventListeners.has('longtap')) {
                         return;
@@ -239,7 +255,11 @@
 
             function addMapIdleEventListener(mapId) {
                 const mapInstance = getMapInstance(mapId);
-                const channel = window[`MapEvent_${mapId}`];
+                const channelName = `MapEvent_${mapId}`;
+                const channel = window[channelName] ||
+                    (window.webkit &&
+                     window.webkit.messageHandlers &&
+                     window.webkit.messageHandlers[channelName]);
                 if (mapInstance && mapInstance.map) {
                     if (mapInstance.mapEventListeners.has('idle')) {
                         return;
@@ -266,7 +286,11 @@
 
             function addMapZoomChangedEventListener(mapId) {
                 const mapInstance = getMapInstance(mapId);
-                const channel = window[`MapEvent_${mapId}`];
+                const channelName = `MapEvent_${mapId}`;
+                const channel = window[channelName] ||
+                    (window.webkit &&
+                     window.webkit.messageHandlers &&
+                     window.webkit.messageHandlers[channelName]);
                 if (mapInstance && mapInstance.map) {
                     if (mapInstance.mapEventListeners.has('zoom_changed')) {
                         return;
@@ -293,7 +317,11 @@
 
             function addMapZoomEndEventListener(mapId) {
                 const mapInstance = getMapInstance(mapId);
-                const channel = window[`MapEvent_${mapId}`];
+                const channelName = `MapEvent_${mapId}`;
+                const channel = window[channelName] ||
+                    (window.webkit &&
+                     window.webkit.messageHandlers &&
+                     window.webkit.messageHandlers[channelName]);
                 if (mapInstance && mapInstance.map) {
                     if (mapInstance.mapEventListeners.has('zoomend')) {
                         return;
@@ -320,7 +348,11 @@
 
             function addMapZoomStartEventListener(mapId) {
                 const mapInstance = getMapInstance(mapId);
-                const channel = window[`MapEvent_${mapId}`];
+                const channelName = `MapEvent_${mapId}`;
+                const channel = window[channelName] ||
+                    (window.webkit &&
+                     window.webkit.messageHandlers &&
+                     window.webkit.messageHandlers[channelName]);
                 if (mapInstance && mapInstance.map) {
                     if (mapInstance.mapEventListeners.has('zoomstart')) {
                         return;
@@ -347,7 +379,11 @@
 
             function addMapCenterChangedEventListener(mapId) {
                 const mapInstance = getMapInstance(mapId);
-                const channel = window[`MapEvent_${mapId}`];
+                const channelName = `MapEvent_${mapId}`;
+                const channel = window[channelName] ||
+                    (window.webkit &&
+                     window.webkit.messageHandlers &&
+                     window.webkit.messageHandlers[channelName]);
                 if (mapInstance && mapInstance.map) {
                     if (mapInstance.mapEventListeners.has('center_changed')) {
                         return;
