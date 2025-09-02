@@ -85,7 +85,7 @@ import 'package:naver_maps_sdk_flutter/sdk_app/naver_maps_sdk_flutter_app.dart'
 
 ```dart
 class _MyHomePageState extends State<MyHomePage> {
-    final NaverMapManager _naverMapManager = NaverMapSDK.createNaverMapManager();
+    final NaverMapManager _naverMapManager = NaverMapManager.createNaverMapManager();
     late final StreamSubscription _mapStatusSubscription;
     late final StreamSubscription _markerEventSubscription;
 
@@ -152,7 +152,7 @@ Widget build(BuildContext context) {
 
 ### 6. NaverMap 조작
 - `NaverMapManager` 인스턴스를 통해 지도를 조작할 수 있습니다.
-- `onMapLoadStatus` 스트림을 통해 `Success` 상태가 전달된 이후에 호출하는 것이 안전합니다.
+- `onMapLoadStatus` 스트림을 통해 `MapLoadSuccess` 상태가 전달된 이후에 호출하는 것이 안전합니다.
 
 ```dart
 Future<void> setZoom(zoomLevel) async {
@@ -180,7 +180,8 @@ Future<void> addMarkers() async {
 ## 플랫폼별 참고사항
 ### Web: HTTPS 환경 필요
 - 웹 플랫폼에서 Naver Maps API를 사용하려면, **HTTPS** 환경에서 애플리케이션을 실행해야 합니다.
-- `localhost` 또는 HTTP 환경에서는 API 인증이 실패하여 지도가 정상적으로 표시되지 않을 수 있습니다. 개발 시 이 점에 유의하여 HTTPS를 지원하는 호스팅 환경에서 테스트하시기 바랍니다.
+- HTTP 환경에서는 API 인증이 실패하여 지도가 정상적으로 표시되지 않을 수 있습니다. 개발 시 이 점에 유의하여 HTTPS를 지원하는 호스팅 환경에서 테스트하시기 바랍니다.
+- 개발 단계에서 웹 플랫폼으로 실행 시 지도 표출 확인을 위해서는 [NaverCloudConsole](https://www.ncloud.com)의 Web 서비스 URL에 **http://localhost**를 등록하면 확인 가능합니다.
 
 ### Android: HTTP 통신 설정
 - **Android 9 (API 28) 이상**에서는 보안 강화를 위해 HTTP 통신이 기본적으로 차단됩니다.
@@ -224,5 +225,5 @@ Future<void> addMarkers() async {
     <true/>
 </dict>
 ```
-
-* 모든 저작권은 Naver에 있으며, 해당 SDK는 Naver 공식SDK가 아닙니다. *
+---
+‼️ 모든 저작권은 Naver에 있으며, 해당 SDK는 Naver 공식SDK가 아닙니다.
