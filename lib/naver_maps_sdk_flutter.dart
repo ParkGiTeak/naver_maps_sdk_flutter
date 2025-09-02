@@ -9,17 +9,17 @@ class NaverMapSDK {
 
   late final String _clientId;
   late final NaverMapLanguageType _language;
-  late final String _webServiceUrl;
+  String? _webServiceUrl;
 
   String get clientId => _clientId;
 
   NaverMapLanguageType get language => _language;
 
-  String get webServiceUrl => _webServiceUrl;
+  String? get webServiceUrl => _webServiceUrl;
 
   static void initialize({
     required String clientId,
-    required String webServiceUrl,
+    String? webServiceUrl,
     NaverMapLanguageType language = NaverMapLanguageType.korean,
   }) {
     instance._clientId = clientId;
