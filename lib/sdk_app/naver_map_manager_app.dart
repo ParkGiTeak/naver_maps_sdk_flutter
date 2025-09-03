@@ -117,7 +117,8 @@ class NaverMapManager implements NaverMapManagerInterface {
         onMessageReceived: (JavaScriptMessage message) {
           final Map<String, dynamic> json = jsonDecode(message.message);
           if (json['type'] == 'markerClick') {
-            onMarkerClick(json['markerId']);
+            final String markerId = json['markerId'].toString();
+            onMarkerClick(markerId);
           }
         },
       )
