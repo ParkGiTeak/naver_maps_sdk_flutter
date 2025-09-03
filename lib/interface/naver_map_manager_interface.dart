@@ -9,7 +9,7 @@ abstract interface class NaverMapManagerInterface {
 
   void onMapLoadFail();
 
-  void onMarkerClick(int markerId);
+  void onMarkerClick(String markerId);
 
   void onMapClick(Map<String, dynamic> coord);
 

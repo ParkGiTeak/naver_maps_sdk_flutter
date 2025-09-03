@@ -252,7 +252,7 @@ class NaverMapManager implements NaverMapManagerInterface {
   }
 
   @override
-  void onMarkerClick(int markerId) {
+  void onMarkerClick(String markerId) {
     _markerEventController?.add(MarkerClick(markerId));
   }
 

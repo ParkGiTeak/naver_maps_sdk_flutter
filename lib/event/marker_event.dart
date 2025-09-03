@@ -3,6 +3,6 @@ sealed class MarkerEvent {
 }
 
 class MarkerClick extends MarkerEvent {
-  final int markerId;
+  final String markerId;
   const MarkerClick(this.markerId);
 }
