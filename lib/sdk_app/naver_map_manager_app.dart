@@ -315,7 +315,7 @@ class NaverMapManager implements NaverMapManagerInterface {
     required MarkerOptions markerOptions,
   }) async {
     await _controller.runJavaScript(
-      'window.addMarker(${jsonEncode(_mapId)}, $markerId, ${markerOptions.toJson()})',
+      'window.addMarker(${jsonEncode(_mapId)}, ${jsonEncode(markerId)}, ${markerOptions.toJson()})',
     );
   }
 
@@ -325,14 +325,14 @@ class NaverMapManager implements NaverMapManagerInterface {
     required MarkerOptions markerOptions,
   }) async {
     await _controller.runJavaScript(
-      'window.updateMarker(${jsonEncode(_mapId)}, $markerId, ${markerOptions.toJson()})',
+      'window.updateMarker(${jsonEncode(_mapId)}, ${jsonEncode(markerId)}, ${markerOptions.toJson()})',
     );
   }
 
   @override
   Future<void> removeMarker({required String markerId}) async {
     await _controller.runJavaScript(
-      'window.removeMarker(${jsonEncode(_mapId)}, $markerId)',
+      'window.removeMarker(${jsonEncode(_mapId)}, ${jsonEncode(markerId)})',
     );
   }
 
@@ -360,14 +360,14 @@ class NaverMapManager implements NaverMapManagerInterface {
   @override
   Future<void> addMarkerClickEvent({required String markerId}) async {
     await _controller.runJavaScript(
-      'window.addMarkerClickEvent(${jsonEncode(_mapId)}, $markerId)',
+      'window.addMarkerClickEvent(${jsonEncode(_mapId)}, ${jsonEncode(markerId)})',
     );
   }
 
   @override
   Future<void> removeMarkerClickEvent({required String markerId}) async {
     await _controller.runJavaScript(
-      'window.removeMarkerClickEvent(${jsonEncode(_mapId)}, $markerId)',
+      'window.removeMarkerClickEvent(${jsonEncode(_mapId)}, ${jsonEncode(markerId)})',
     );
   }
 
