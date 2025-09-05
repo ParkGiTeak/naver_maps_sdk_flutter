@@ -7,11 +7,11 @@ class NaverMapSDK {
 
   static NaverMapSDK get instance => _instance ??= NaverMapSDK._internal();
 
-  late final String _clientId;
-  late final NaverMapLanguageType _language;
+  late String _clientId;
+  late NaverMapLanguageType _language;
   String? _webServiceUrl;
 
-  String get clientId => _clientId;
+  String? get clientId => _clientId;
 
   NaverMapLanguageType get language => _language;
 
