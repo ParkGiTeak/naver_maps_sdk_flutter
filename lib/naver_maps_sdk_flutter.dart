@@ -11,7 +11,7 @@ class NaverMapSDK {
   late NaverMapLanguageType _language;
   String? _webServiceUrl;
 
-  String? get clientId => _clientId;
+  String get clientId => _clientId;
 
   NaverMapLanguageType get language => _language;
 
