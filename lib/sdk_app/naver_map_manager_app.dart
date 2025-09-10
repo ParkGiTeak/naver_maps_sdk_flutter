@@ -11,6 +11,8 @@ class NaverMapManager implements NaverMapManagerInterface {
   StreamController<MarkerEvent>? _markerEventController;
   StreamController<MapEvent>? _mapEventController;
 
+  void Function(String url)? onTapLink;
+
   Stream<MapLoadStatus> get onMapLoadStatus {
     _mapLoadStatusController = StreamController<MapLoadStatus>.broadcast();
     return _mapLoadStatusController!.stream;
@@ -61,6 +63,16 @@ class NaverMapManager implements NaverMapManagerInterface {
           },
           onWebResourceError: (WebResourceError error) {
             debugPrint('WebView Error:: ${error.description}');
+          },
+          onNavigationRequest: (request) {
+            if (_pageFinishedCompleter.isCompleted &&
+                onTapLink != null &&
+                request.isMainFrame &&
+                request.url.startsWith('http')) {
+              onTapLink!(request.url);
+              return NavigationDecision.prevent;
+            }
+            return NavigationDecision.navigate;
           },
         ),
       )

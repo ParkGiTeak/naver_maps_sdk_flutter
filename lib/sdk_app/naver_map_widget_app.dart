@@ -14,6 +14,22 @@ class NaverMapWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    naverMapManager.onTapLink = (url) {
+      final controller = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..loadRequest(Uri.parse(url));
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SafeArea(
+            child: Scaffold(
+              body: WebViewWidget(controller: controller),
+            ),
+          ),
+        ),
+      );
+    };
+
     return FutureBuilder<void>(
       future: naverMapManager.onPageFinished,
       builder: (context, snapshot) {
