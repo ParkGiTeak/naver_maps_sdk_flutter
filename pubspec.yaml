@@ -1,7 +1,10 @@
 name: naver_maps_sdk_flutter
 description: "Flutter Naver Maps SDK"
-version: 0.1.4
-homepage:
+version: 1.0.0
+homepage: https://github.com/ParkGiTeak/naver_maps_sdk_flutter
+repository: https://github.com/ParkGiTeak/naver_maps_sdk_flutter
+issue_tracker: https://github.com/ParkGiTeak/naver_maps_sdk_flutter/issues
+
 
 environment:
   sdk: ^3.8.1
@@ -21,3 +24,10 @@ dev_dependencies:
 flutter:
   assets:
     - assets/naver_map.html
+
+topics:
+  - maps
+  - naver
+  - navermap
+  - naverflutter
+  - naversdk
