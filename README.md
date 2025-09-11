@@ -1,6 +1,18 @@
 # NaverMaps API를 간편하게 Widget으로 사용할 수 있는 SDK입니다.
 **지원 플랫폼: `Android`, `iOS`, `Web`**
 
+---
+‼️ 모든 저작권은 Naver에 있으며, 해당 SDK는 Naver 공식SDK가 아닙니다. 
+또한 이 패키지를 사용하려면 네이버 지도 API 이용약관을 준수해야 합니다.
+---
+## 설치하기
+   pubspec.yaml 파일의 dependencies에 아래와 같이 추가합니다.
+
+   ```yaml
+   dependencies:
+     naver_maps_sdk_flutter: ^(latest_version)
+   ```
+
 ## 시작하기
 ### 1. NaverMapSDK 초기화
 - `NaverMapWidget`을 사용하기 전에 [NaverCloudConsole](https://www.ncloud.com)에 등록된 **Client ID**를 `NaverMapSDK` 초기화 시 입력해줍니다.
@@ -31,12 +43,15 @@ import 'package:naver_maps_sdk_flutter/sdk_web/naver_maps_sdk_flutter_web.dart';
 
 #### 멀티 플랫폼 개발 (App과 Web을 동시에 개발하는 경우)
 - 조건부 임포트를 사용하면, 코드 한 벌로 모든 플랫폼을 지원할 수 있습니다.
+
 ```dart
 import 'package:naver_maps_sdk_flutter/sdk_app/naver_maps_sdk_flutter_app.dart'
     if (dart.library.html) 'package:naver_maps_sdk_flutter/sdk_web/naver_maps_sdk_flutter_web.dart';
 ```
 
-### 3. NaverMapManager API
+### 3. NaverMapManager API 상세
+- NaverMapManager를 통해 지도를 제어하고 이벤트를 수신할 수 있습니다.
+- NaverMapManager는 NaverMapWidget과 1:1 관계로 각 지도별 하나의 인스턴스를 가집니다.
 
 #### 지도 제어
 | Method | Parameters | Return | Description |
@@ -84,51 +99,106 @@ import 'package:naver_maps_sdk_flutter/sdk_app/naver_maps_sdk_flutter_app.dart'
 - 이벤트는 **Sealed Class**로 그룹화되어 있어, `switch` 문을 사용해 타입에 따라 안전하게 처리할 수 있습니다.
 
 ```dart
-class _MyHomePageState extends State<MyHomePage> {
-    final NaverMapManager _naverMapManager = NaverMapManager.createNaverMapManager();
-    late final StreamSubscription _mapStatusSubscription;
-    late final StreamSubscription _markerEventSubscription;
+class MapScreen extends StatefulWidget {
+  final NaverMapManager _naverMapManager = NaverMapManager.createNaverMapManager();
+  late final StreamSubscription _mapStatusSubscription;
+  late final StreamSubscription _markerEventSubscription;
+  late final StreamSubscription _mapEventSubscription;
 
+  MapScreen({super.key});
+
+  @override
+  State<MapScreen> createState() => _MapScreenState();
+}
+
+class _MapScreenState extends State<MyHomePage> {
     @override
     void initState() {
         super.initState();
         // 지도 로딩 상태 스트림 구독
-        _mapStatusSubscription = _naverMapManager.onMapLoadStatus.listen((status) {
+        _mapStatusSubscription = widget._naverMapManager.onMapLoadStatus.listen((status) {
             switch (status) {
                 case Success():
                     print("NaverMap is Ready!");
-                    _naverMapManager.setCenter(center: NLatLng(37.466259, 126.889611));
-                    _addMarkers();
+                    widget._naverMapManager
+                      ..addMapCenterChangedEventListener()
+                      ..addMapIdleEventListener()
+                      ..addMapZoomChangedEventListener()
+                      ..addMapZoomEndEventListener()
+                      ..addMapZoomStartEventListener()
+                      ..addMapClickEventListener()
+                      ..addMapLongTapEventListener();
                     break;
                 case Fail():
-                    print("NaverMap Load FAILED!");
+                    print("NaverMap Load Fail!");
                     break;
             }
         });
 
         // 마커 이벤트 스트림 구독
-        _markerEventSubscription = _naverMapManager.onMarkerEvent.listen((event) {
+        _markerEventSubscription = widget._naverMapManager.onMarkerEvent.listen((event) {
             switch (event) {
                 case MarkerTap(markerId: final id):
                     print("Tapped Marker ID: $id");
                     break;
             }
         });
+
+        // 지도 이벤트 스트림 구독
+        widget._mapEventSubscription = widget._naverMapManager.onMapEvent.listen(
+              (event) {
+            switch (event) {
+              case MapClick():
+                debugPrint('onMapEvent:: MapClick');
+                final NLatLng latLng = event.latLng;
+                final NPoint point = event.point;
+                debugPrint('MapClick latLng:: $latLng');
+                debugPrint('MapClick point:: $point');
+                break;
+              case MapLongTap():
+                debugPrint('onMapEvent:: MapLongTap');
+                final NLatLng latLng = event.latLng;
+                final NPoint point = event.point;
+                debugPrint('MapLongTap latLng:: $latLng');
+                debugPrint('MapLongTap point:: $point');
+                break;
+              case MapIdle():
+                debugPrint('onMapEvent:: MapIdle');
+                break;
+              case MapZoomChanged():
+                debugPrint('onMapEvent:: MapZoomChanged');
+                final int zoomLevel = event.zoom;
+                debugPrint('MapZoomChanged zoomLevel:: $zoomLevel');
+              case MapZoomEnd():
+                debugPrint('onMapEvent:: MapZoomEnd');
+              case MapZoomStart():
+                debugPrint('onMapEvent:: MapZoomStart');
+              case MapCenterChanged():
+                debugPrint('onMapEvent:: MapCenterChanged');
+                final NLatLng latLng = event.latLng;
+                final NPoint point = event.point;
+                debugPrint('MapCenterChanged latLng:: $latLng');
+                debugPrint('MapCenterChanged point:: $point');
+            }
+          },
+        );
     }
 
     @override
     void dispose() {
-        _mapStatusSubscription.cancel();
-        _markerEventSubscription.cancel();
-        _naverMapManager.dispose(); // manager의 StreamController들을 해제하기 위해서 disopose처리 필수.
+        widget._mapStatusSubscription.cancel();
+        widget._markerEventSubscription.cancel();
+        widget._mapEventSubscription.cancel();
+        widget._naverMapManager.dispose(); // manager의 StreamController들을 해제하기 위해서 disopose처리 필수.
         super.dispose();
     }
 }
 ```
 
 ### 5. NaverMapWidget 사용
-- `build` 메서드 안에서 `NaverMapWidget`을 생성하고, `initState`에서 생성한 `NaverMapManager` 인스턴스를 넘겨줍니다.
+- `build` 메서드 안에서 `NaverMapWidget`을 생성하고, `NaverMapManager` 인스턴스를 넘겨줍니다.
 - `mapOptions`는 선택사항이며, 추가하지 않으면 기본 설정으로 지도가 표시됩니다.
+- `showLoading`은 `true`로 설정하면 로딩 중 표시됩니다.
 
 ```dart
 @override
@@ -143,8 +213,9 @@ Widget build(BuildContext context) {
 
     return Scaffold(
         body: NaverMapWidget(
-            naverMapManager: _naverMapManager,
+            naverMapManager: NaverMapManager.createNaverMapManager(),
             mapOptions: mapOptions,
+            showLoading: true, // 기본값 false
         ),
     );
 }
@@ -152,25 +223,40 @@ Widget build(BuildContext context) {
 
 ### 6. NaverMap 조작
 - `NaverMapManager` 인스턴스를 통해 지도를 조작할 수 있습니다.
-- `onMapLoadStatus` 스트림을 통해 `MapLoadSuccess` 상태가 전달된 이후에 호출하는 것이 안전합니다.
+- `onMapLoadStatus` 스트림을 통해 `MapLoadSuccess` 상태가 전달된 이후에 호출합니다.
 
 ```dart
-Future<void> setZoom(zoomLevel) async {
-    await _naverMapManager.setZoom(zoom: 18);
-    print('zoomLevel:: ${await _naverMapManager.getZoom()}');
+Future<void> getCenter() async {
+  final center = await widget._naverMapManager.getCenter(shouldReturnLatLng: true);
+  switch (center) {
+    case NLatLng():
+      debugPrint('mapInitSet center is NLatLng center.lat: ${center.lat} center.lng: ${center.lng}');
+      break;
+    case NPoint():
+      debugPrint('mapInitSet center is NPoint center.x: ${center.x} center.y: ${center.y}');
+  }
+}
+
+Future<void> setCenter(NLatLng position) async {
+  await widget._naverMapManager.setCenter(center: position);
+}
+
+Future<void> setZoom(int zoomLevel) async {
+    await widget._naverMapManager.setZoom(zoom: 18);
+    debugPrint('zoomLevel:: ${await widget._naverMapManager.getZoom()}');
 }
 
 Future<void> addMarkers() async {
     for (int i = 0; i < 10; i++) {
-        await _naverMapManager.addMarker(
+        await widget._naverMapManager.addMarker(
             markerId: i.toString(), // markerId는 String 타입입니다.
             markerOptions: MarkerOptions(
                 position: NLatLng(37.466259 + i * 0.001, 126.889611),
-                animation: NAnimation.drop,
+                animation: NAnimation.drop, // marker의 애니메이션 설정
             ),
         );
         // 마커 클릭 이벤트를 활성화합니다.
-        _naverMapManager.addMarkerClickEvent(markerId: i.toString());
+        widget._naverMapManager.addMarkerClickEvent(markerId: i.toString());
     }
 }
 ```
@@ -225,5 +311,3 @@ Future<void> addMarkers() async {
     <true/>
 </dict>
 ```
----
-‼️ 모든 저작권은 Naver에 있으며, 해당 SDK는 Naver 공식SDK가 아닙니다.
